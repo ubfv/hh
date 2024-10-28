@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لعبة تجاوز المعثرات</title>
     <style>
+        /* تصميم الصفحة بألوان جذابة */
         body {
             display: flex;
             justify-content: center;
@@ -36,8 +37,8 @@
         #gameContainer {
             display: none;
             position: relative;
-            width: 400px; /* تعديل العرض */
-            height: 300px; /* تعديل الارتفاع */
+            width: 50vw; /* تصغير العرض إلى 50% من عرض الشاشة */
+            height: 40vh; /* تصغير الارتفاع إلى 40% من ارتفاع الشاشة */
             background-color: #64b5f6;
             overflow: hidden;
             border-radius: 20px;
@@ -49,8 +50,8 @@
             position: absolute;
             bottom: 50px;
             left: 50%;
-            width: 40px; /* تقليل حجم الكرة */
-            height: 40px; /* تقليل حجم الكرة */
+            width: 50px; /* تصغير حجم الكرة */
+            height: 50px; /* تصغير حجم الكرة */
             background-color: #ff4081;
             border-radius: 50%;
             transform: translateX(-50%);
@@ -61,11 +62,11 @@
         /* المعثرات */
         .obstacle {
             position: absolute;
-            width: 50px; /* تقليل حجم المعثرات */
-            height: 25px; /* تقليل حجم المعثرات */
+            width: 100px;
+            height: 50px;
             background-color: #f44336;
             border-radius: 5px;
-            top: -30px;
+            top: -60px;
             transition: background-color 0.3s;
         }
 
@@ -76,19 +77,21 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 18px;
+            font-size: 24px;
             color: #fff;
             text-align: center;
             background-color: rgba(0, 0, 0, 0.7);
-            padding: 10px;
+            padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
     </style>
 </head>
 <body>
+    <!-- زر البدء -->
     <button id="startButton">ابدأ</button>
 
+    <!-- حاوية اللعبة -->
     <div id="gameContainer">
         <div id="ball"></div>
         <div id="gameOverMessage">لقد خسرت! اضغط ابدأ لتجرب مرة أخرى.</div>
@@ -102,11 +105,12 @@
         
         let isGameRunning = false;
         let ballPositionX = gameContainer.clientWidth / 2;
-        let ballPositionY = 50;
+        let ballPositionY = gameContainer.clientHeight - 100;
         let obstacles = [];
         let obstacleInterval;
         let moveInterval;
-        let speed = 2; // تقليل سرعة الحركة
+        let speed = 10;
+        let ballSpeed = 5;
 
         // بدء اللعبة
         startButton.addEventListener("click", () => {
@@ -119,9 +123,9 @@
         function startGame() {
             isGameRunning = true;
             ballPositionX = gameContainer.clientWidth / 2;
-            ballPositionY = 50;
+            ballPositionY = gameContainer.clientHeight - 100;
             ball.style.left = ballPositionX + "px";
-            ball.style.bottom = ballPositionY + "px";
+            ball.style.bottom = 50 + "px";
 
             obstacles = [];
             obstacleInterval = setInterval(createObstacle, 1000);
@@ -141,7 +145,7 @@
         function createObstacle() {
             const obstacle = document.createElement("div");
             obstacle.classList.add("obstacle");
-            obstacle.style.left = Math.random() * (gameContainer.clientWidth - 50) + "px";
+            obstacle.style.left = Math.random() * (gameContainer.clientWidth - 100) + "px";
             gameContainer.appendChild(obstacle);
             obstacles.push(obstacle);
         }
@@ -150,7 +154,7 @@
             if (!isGameRunning) return;
 
             obstacles.forEach(obstacle => {
-                const obstacleTop = parseFloat(obstacle.style.top || "-30px") + speed;
+                const obstacleTop = parseFloat(obstacle.style.top || "-60px") + speed;
                 obstacle.style.top = obstacleTop + "px";
 
                 if (obstacleTop > gameContainer.clientHeight) {
@@ -158,6 +162,7 @@
                     obstacles = obstacles.filter(o => o !== obstacle);
                 }
 
+                // التحقق من الاصطدام
                 const ballRect = ball.getBoundingClientRect();
                 const obstacleRect = obstacle.getBoundingClientRect();
                 if (
@@ -171,26 +176,28 @@
             });
         }
 
-        // التحكم بالكرة باستخدام الأسهم
+        // التحكم بالكرة عن طريق لوحة المفاتيح
         document.addEventListener("keydown", (event) => {
             if (!isGameRunning) return;
 
-            const containerRect = gameContainer.getBoundingClientRect();
-            const step = 10; // مقدار الحركة لكل ضغطة
-
-            if (event.key === "ArrowRight" && ballPositionX + step < containerRect.width - ball.clientWidth) {
-                ballPositionX += step;
-            } else if (event.key === "ArrowLeft" && ballPositionX - step > 0) {
-                ballPositionX -= step;
-            } else if (event.key === "ArrowUp" && ballPositionY + step < containerRect.height - ball.clientHeight) {
-                ballPositionY += step;
-            } else if (event.key === "ArrowDown" && ballPositionY - step > 0) {
-                ballPositionY -= step;
+            switch(event.key) {
+                case "ArrowUp":
+                    if (ballPositionY > 0) ballPositionY -= ballSpeed;
+                    break;
+                case "ArrowDown":
+                    if (ballPositionY < gameContainer.clientHeight - ball.clientHeight) ballPositionY += ballSpeed;
+                    break;
+                case "ArrowLeft":
+                    if (ballPositionX > 0) ballPositionX -= ballSpeed;
+                    break;
+                case "ArrowRight":
+                    if (ballPositionX < gameContainer.clientWidth - ball.clientWidth) ballPositionX += ballSpeed;
+                    break;
             }
 
             ball.style.left = ballPositionX + "px";
-            ball.style.bottom = ballPositionY + "px";
+            ball.style.top = ballPositionY + "px";
         });
     </script>
 </body>
-</html>
+        </html>
