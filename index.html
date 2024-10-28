@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لعبة تجاوز المعثرات</title>
     <style>
-        /* تصميم الصفحة بألوان جذابة */
+        /* تصميم الصفحة بألوان جديدة جذابة */
         body {
             display: flex;
             justify-content: center;
@@ -13,7 +13,7 @@
             height: 100vh;
             margin: 0;
             font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); /* لون خارجي جذاب */
+            background: linear-gradient(135deg, #4a90e2 0%, #8e44ad 100%); /* لون خارجي جذاب */
             overflow: hidden;
         }
 
@@ -22,7 +22,7 @@
             padding: 15px 30px;
             font-size: 20px;
             color: #fff;
-            background-color: #ff5722; /* لون زري فاتح */
+            background-color: #27ae60; /* لون زر جديد */
             border: none;
             border-radius: 10px;
             cursor: pointer;
@@ -30,16 +30,16 @@
         }
         
         #startButton:hover {
-            background-color: #e64a19; /* لون عند التحويم */
+            background-color: #219653; /* لون عند التحويم */
         }
 
         /* حاوية اللعبة */
         #gameContainer {
             display: none;
             position: relative;
-            width: 80vw;
-            height: 70vh;
-            background-color: #00bcd4; /* لون مميز للخلفية الداخلية */
+            width: 60vw;  /* تصغير عرض حاوية اللعبة */
+            height: 50vh; /* تصغير ارتفاع حاوية اللعبة */
+            background-color: #f1c40f; /* لون مميز للخلفية الداخلية */
             overflow: hidden;
             border-radius: 20px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
@@ -48,11 +48,11 @@
         /* الكرة */
         #ball {
             position: absolute;
-            bottom: 50px;
+            bottom: 30px; /* تقليل المسافة من الأسفل */
             left: 50%;
-            width: 100px; /* تكبير حجم الكرة */
-            height: 100px; /* تكبير حجم الكرة */
-            background-color: #ffc107; /* لون الكرة */
+            width: 60px; /* تصغير حجم الكرة */
+            height: 60px; /* تصغير حجم الكرة */
+            background-color: #e67e22; /* لون الكرة */
             border-radius: 50%;
             transform: translateX(-50%);
             cursor: pointer;
@@ -62,11 +62,11 @@
         /* المعثرات */
         .obstacle {
             position: absolute;
-            width: 120px; /* تكبير المعثرات */
-            height: 60px; /* تكبير المعثرات */
-            background-color: #f44336; /* لون المعثرات */
+            width: 80px; /* تصغير المعثرات */
+            height: 40px; /* تصغير المعثرات */
+            background-color: #c0392b; /* لون المعثرات جديد */
             border-radius: 5px;
-            top: -60px;
+            top: -40px;
             transition: background-color 0.3s;
         }
 
@@ -108,7 +108,7 @@
         let obstacles = [];
         let obstacleInterval;
         let moveInterval;
-        let speed = 5; // زيادة السرعة الأساسية
+        let speed = 2; // سرعة البداية
 
         // بدء اللعبة
         startButton.addEventListener("click", () => {
@@ -122,7 +122,7 @@
             isGameRunning = true;
             ballPositionX = gameContainer.clientWidth / 2;
             ball.style.left = ballPositionX + "px";
-            speed = 5; // إعادة تعيين السرعة
+            speed = 2; // إعادة تعيين السرعة (تبدأ بسرعة)
 
             obstacles = [];
             obstacleInterval = setInterval(createObstacle, 2000);
@@ -142,7 +142,7 @@
         function createObstacle() {
             const obstacle = document.createElement("div");
             obstacle.classList.add("obstacle");
-            obstacle.style.left = Math.random() * (gameContainer.clientWidth - 120) + "px"; // ضبط مكان المعثرة بدقة
+            obstacle.style.left = Math.random() * (gameContainer.clientWidth - 80) + "px"; // ضبط مكان المعثرة بدقة
             gameContainer.appendChild(obstacle);
             obstacles.push(obstacle);
         }
@@ -151,7 +151,7 @@
             if (!isGameRunning) return;
 
             obstacles.forEach(obstacle => {
-                const obstacleTop = parseFloat(obstacle.style.top || "-60px") + speed;
+                const obstacleTop = parseFloat(obstacle.style.top || "-40px") + speed;
                 obstacle.style.top = obstacleTop + "px";
 
                 if (obstacleTop > gameContainer.clientHeight) {
@@ -171,6 +171,9 @@
                     endGame();
                 }
             });
+
+            // زيادة السرعة تدريجياً
+            speed += 0.01; // زيادة السرعة بشكل تدريجي
         }
 
         // التحكم بالكرة عن طريق السحب
