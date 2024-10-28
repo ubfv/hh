@@ -61,8 +61,8 @@
             position: absolute;
             bottom: 50px;
             left: 50%;
-            width: 60px;
-            height: 60px;
+            width: 45px;
+            height: 45px;
             background-color: #ff4081;
             border-radius: 50%;
             transform: translateX(-50%);
@@ -90,7 +90,7 @@
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
-
+        
         #scoreDisplay {
             position: absolute;
             top: 10px;
@@ -98,27 +98,6 @@
             transform: translateX(-50%);
             font-size: 24px;
             color: #fff;
-        }
-
-        #restartButton {
-            display: none;
-            padding: 15px 30px;
-            font-size: 20px;
-            color: #fff;
-            background-color: #ff5722;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            margin-top: 20px;
-            position: absolute;
-            top: 70%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        #restartButton:hover {
-            background-color: #e64a19;
         }
     </style>
 </head>
@@ -132,7 +111,6 @@
         <div id="ball"></div>
         <div id="scoreDisplay">النقاط: 0</div>
         <div id="gameOverMessage">لقد خسرت! اضغط ابدأ لتجرب مرة أخرى.</div>
-        <button id="restartButton">إعادة اللعب</button>
     </div>
 
     <script>
@@ -142,13 +120,12 @@
         const gameOverMessage = document.getElementById("gameOverMessage");
         const scoreDisplay = document.getElementById("scoreDisplay");
         const welcomeMessage = document.getElementById("welcomeMessage");
-        const restartButton = document.getElementById("restartButton");
 
         let isGameRunning = false;
         let obstacles = [];
         let obstacleInterval;
         let moveInterval;
-        let speed = 5; // السرعة الابتدائية متوسطة
+        let speed = 10; // سرعة العقبات
         let score = 0;
         let isDragging = false;
 
@@ -164,20 +141,7 @@
             welcomeMessage.style.display = "none";
             gameContainer.style.display = "block";
             gameOverMessage.style.display = "none";
-            restartButton.style.display = "none"; // إخفاء زر إعادة اللعب
             score = 0; // إعادة تعيين النقاط عند بدء اللعبة
-            speed = 5; // إعادة تعيين السرعة عند بدء اللعبة
-            scoreDisplay.textContent = `النقاط: ${score}`;
-            startGame();
-        });
-
-        restartButton.addEventListener("click", () => {
-            welcomeMessage.style.display = "none";
-            gameContainer.style.display = "block";
-            gameOverMessage.style.display = "none";
-            restartButton.style.display = "none"; // إخفاء زر إعادة اللعب
-            score = 0; // إعادة تعيين النقاط عند إعادة اللعب
-            speed = 5; // إعادة تعيين السرعة عند إعادة اللعب
             scoreDisplay.textContent = `النقاط: ${score}`;
             startGame();
         });
@@ -196,7 +160,8 @@
             obstacles.forEach(obstacle => obstacle.remove());
             obstacles = [];
             gameOverMessage.style.display = "block";
-            restartButton.style.display = "block"; // إظهار زر إعادة اللعب
+            startButton.style.display = "block";
+            welcomeMessage.style.display = "block";
         }
 
         function createObstacle() {
@@ -236,68 +201,80 @@
                     obstacles = obstacles.filter(o => o !== obstacle);
                     score += 10; // زيادة النقاط عند تجنب العقبات
                     scoreDisplay.textContent = `النقاط: ${score}`;
-
-                    // زيادة السرعة كل 50 نقطة
-                    if (score % 150 === 0) {
-                        speed += 2; // زيادة السرعة
-                    }
-// تغيير لون خلفية اللعبة بشكل عشوائي عند الوصول إلى 100 نقطة
+                    
+                    // تغيير لون خلفية اللعبة بشكل عشوائي عند الوصول إلى 100 نقطة
                     if (score >= 100) {
-                        gameContainer.style.backgroundColor = getRandomColor();
+                        gameContainer.style.backgroundColor = getRandomColor(); // تغيير لون الخلفية الداخلية
+                        // تكرار استخدام اللون الأحمر بشكل أكبر
+                        if (Math.random() < 0.5) {
+                            gameContainer.style.backgroundColor = "#f44336"; // اللون الأحمر
+                        }
                     }
                 }
 
-                // التحقق من الاصطدام مع الكرة
+                // إصلاح منطق الاصطدام
                 const ballRect = ball.getBoundingClientRect();
                 const obstacleRect = obstacle.getBoundingClientRect();
-
                 if (
-                    ballRect.x < obstacleRect.x + obstacleRect.width &&
-                    ballRect.x + ballRect.width > obstacleRect.x &&
-                    ballRect.y < obstacleRect.y + obstacleRect.height &&
-                    ballRect.y + ballRect.height > obstacleRect.y
+                    ballRect.left < obstacleRect.right &&
+                    ballRect.right > obstacleRect.left &&
+                    ballRect.bottom > obstacleRect.top &&
+                    ballRect.top < obstacleRect.bottom
                 ) {
-                    endGame(); // إنهاء اللعبة عند الاصطدام
+                    endGame();
                 }
             });
         }
 
-        ball.addEventListener("mousedown", () => {
+        // دعم اللمس لتحريك الكرة
+        ball.addEventListener("touchstart", (event) => {
             isDragging = true;
         });
 
-        document.addEventListener("mouseup", () => {
+        ball.addEventListener("touchmove", (event) => {
+            if (isDragging) {
+                const touch = event.touches[0];
+                const containerRect = gameContainer.getBoundingClientRect();
+                const ballRadius = ball.clientWidth / 2;
+
+                let newLeft = touch.clientX - containerRect.left - ballRadius;
+                let newTop = touch.clientY - containerRect.top - ballRadius;
+
+                newLeft = Math.max(0, Math.min(newLeft, gameContainer.clientWidth - ball.clientWidth));
+                newTop = Math.max(0, Math.min(newTop, gameContainer.clientHeight - ball.clientHeight));
+
+                ball.style.left = newLeft + "px";
+                ball.style.top = newTop + "px";
+            }
+        });
+
+        ball.addEventListener("touchend", () => {
             isDragging = false;
+        });
+
+        // دعم السحب بالفأرة
+        ball.addEventListener("mousedown", (event) => {
+            isDragging = true;
         });
 
         document.addEventListener("mousemove", (event) => {
             if (isDragging) {
-                const ballRect = ball.getBoundingClientRect();
-                const newX = event.clientX - ballRect.width / 2;
-                if (newX > 0 && newX < gameContainer.clientWidth - ballRect.width) {
-                    ball.style.left = newX + "px";
-                }
+                const containerRect = gameContainer.getBoundingClientRect();
+                const ballRadius = ball.clientWidth / 2;
+
+                let newLeft = event.clientX - containerRect.left - ballRadius;
+                let newTop = event.clientY - containerRect.top - ballRadius;
+
+                newLeft = Math.max(0, Math.min(newLeft, gameContainer.clientWidth - ball.clientWidth));
+                newTop = Math.max(0, Math.min(newTop, gameContainer.clientHeight - ball.clientHeight));
+
+                ball.style.left = newLeft + "px";
+                ball.style.top = newTop + "px";
             }
         });
 
-        // تفعيل التحكم باللمس للهواتف المحمولة
-        ball.addEventListener("touchstart", (event) => {
-            isDragging = true;
-            event.preventDefault(); // منع سلوك التمرير الافتراضي
-        });
-
-        document.addEventListener("touchend", () => {
+        document.addEventListener("mouseup", () => {
             isDragging = false;
-        });
-
-        document.addEventListener("touchmove", (event) => {
-            if (isDragging) {
-                const ballRect = ball.getBoundingClientRect();
-                const newX = event.touches[0].clientX - ballRect.width / 2;
-                if (newX > 0 && newX < gameContainer.clientWidth - ballRect.width) {
-                    ball.style.left = newX + "px";
-                }
-            }
         });
     </script>
 </body>
