@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لعبة تجاوز المعثرات</title>
     <style>
-        /* تصميم الصفحة بألوان جذابة */
         body {
             display: flex;
             justify-content: center;
@@ -17,7 +16,6 @@
             overflow: hidden;
         }
 
-        /* زر البدء */
         #startButton {
             padding: 15px 30px;
             font-size: 20px;
@@ -33,11 +31,10 @@
             background-color: #e64a19;
         }
 
-        /* حاوية اللعبة */
         #gameContainer {
             display: none;
             position: relative;
-            width: 60vw;
+            width: 80vw; /* توسيع العرض */
             height: 80vh;
             background-color: #64b5f6;
             overflow: hidden;
@@ -45,7 +42,6 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
         }
 
-        /* الكرة */
         #ball {
             position: absolute;
             bottom: 50px;
@@ -59,7 +55,6 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
 
-        /* المعثرات */
         .obstacle {
             position: absolute;
             width: 80px;
@@ -70,7 +65,6 @@
             transition: background-color 0.3s;
         }
 
-        /* رسالة الخسارة */
         #gameOverMessage {
             display: none;
             position: absolute;
@@ -88,10 +82,7 @@
     </style>
 </head>
 <body>
-    <!-- زر البدء -->
     <button id="startButton">ابدأ</button>
-
-    <!-- حاوية اللعبة -->
     <div id="gameContainer">
         <div id="ball"></div>
         <div id="gameOverMessage">لقد خسرت! اضغط ابدأ لتجرب مرة أخرى.</div>
@@ -102,14 +93,13 @@
         const gameContainer = document.getElementById("gameContainer");
         const ball = document.getElementById("ball");
         const gameOverMessage = document.getElementById("gameOverMessage");
-        
+
         let isGameRunning = false;
         let obstacles = [];
         let obstacleInterval;
         let speed = 10;
         let isDragging = false;
 
-        // بدء اللعبة
         startButton.addEventListener("click", () => {
             startButton.style.display = "none";
             gameContainer.style.display = "block";
@@ -154,21 +144,21 @@
                     obstacles = obstacles.filter(o => o !== obstacle);
                 }
 
-                // التحقق من الاصطدام
+                // إصلاح منطق الاصطدام
                 const ballRect = ball.getBoundingClientRect();
                 const obstacleRect = obstacle.getBoundingClientRect();
                 if (
                     ballRect.left < obstacleRect.right &&
                     ballRect.right > obstacleRect.left &&
-                    ballRect.top < obstacleRect.bottom &&
-                    ballRect.bottom > obstacleRect.top
+                    ballRect.bottom > obstacleRect.top &&
+                    ballRect.top < obstacleRect.bottom
                 ) {
                     endGame();
                 }
             });
         }
 
-        // إضافة دعم اللمس لتحريك الكرة
+        // دعم اللمس لتحريك الكرة
         ball.addEventListener("touchstart", (event) => {
             isDragging = true;
         });
@@ -179,11 +169,9 @@
                 const containerRect = gameContainer.getBoundingClientRect();
                 const ballRadius = ball.clientWidth / 2;
 
-                // تحديث موقع الكرة بناءً على لمس الشاشة
                 let newLeft = touch.clientX - containerRect.left - ballRadius;
                 let newTop = touch.clientY - containerRect.top - ballRadius;
 
-                // التأكد من بقاء الكرة داخل حدود اللعبة
                 newLeft = Math.max(0, Math.min(newLeft, gameContainer.clientWidth - ball.clientWidth));
                 newTop = Math.max(0, Math.min(newTop, gameContainer.clientHeight - ball.clientHeight));
 
