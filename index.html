@@ -13,7 +13,7 @@
             height: 100vh;
             margin: 0;
             font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%); /* لون خارجي جذاب */
             overflow: hidden;
         }
 
@@ -22,7 +22,7 @@
             padding: 15px 30px;
             font-size: 20px;
             color: #fff;
-            background-color: #ff6363;
+            background-color: #ff4b4b;
             border: none;
             border-radius: 10px;
             cursor: pointer;
@@ -30,7 +30,7 @@
         }
         
         #startButton:hover {
-            background-color: #ff3d3d;
+            background-color: #ff1f1f;
         }
 
         /* حاوية اللعبة */
@@ -39,10 +39,10 @@
             position: relative;
             width: 80vw;
             height: 70vh;
-            background-color: #b3e5fc; /* لون مميز للخلفية الداخلية */
+            background-color: #87ceeb; /* لون مميز للخلفية الداخلية */
             overflow: hidden;
             border-radius: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
         }
 
         /* الكرة */
@@ -50,19 +50,20 @@
             position: absolute;
             bottom: 50px;
             left: 50%;
-            width: 70px; /* تكبير حجم الكرة */
-            height: 70px; /* تكبير حجم الكرة */
-            background-color: #4caf50;
+            width: 80px; /* تكبير حجم الكرة */
+            height: 80px; /* تكبير حجم الكرة */
+            background-color: #ffeb3b; /* لون الكرة */
             border-radius: 50%;
             transform: translateX(-50%);
             cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
 
         /* المعثرات */
         .obstacle {
             position: absolute;
-            width: 90px; /* تكبير المعثرات */
-            height: 40px; /* تكبير المعثرات */
+            width: 100px; /* تكبير المعثرات */
+            height: 50px; /* تكبير المعثرات */
             background-color: #f44336;
             border-radius: 5px;
             top: -50px;
@@ -78,6 +79,11 @@
             transform: translate(-50%, -50%);
             font-size: 24px;
             color: #333;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
     </style>
 </head>
@@ -144,7 +150,7 @@
         function createObstacle() {
             const obstacle = document.createElement("div");
             obstacle.classList.add("obstacle");
-            obstacle.style.left = Math.random() * (gameContainer.clientWidth - 90) + "px";
+            obstacle.style.left = Math.random() * (gameContainer.clientWidth - 100) + "px"; // ضبط مكان المعثرة بدقة
             obstacle.style.backgroundColor = getRandomColor(); // لون عشوائي للمعثرة
             gameContainer.appendChild(obstacle);
             obstacles.push(obstacle);
