@@ -39,7 +39,7 @@
             position: relative;
             width: 80vw;
             height: 70vh;
-            background-color: #00bcd4; /* لون مميز للخلفية الداخلية */
+            background-color: #4caf50; /* لون مميز للخلفية الداخلية */
             overflow: hidden;
             border-radius: 20px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
@@ -50,9 +50,9 @@
             position: absolute;
             bottom: 50px;
             left: 50%;
-            width: 100px; /* تكبير حجم الكرة */
-            height: 100px; /* تكبير حجم الكرة */
-            background-color: #ffc107; /* لون الكرة */
+            width: 70px; /* تقليل حجم الكرة */
+            height: 70px; /* تقليل حجم الكرة */
+            background-color: #ff4081; /* لون الكرة الوردي الفاتح */
             border-radius: 50%;
             transform: translateX(-50%);
             cursor: pointer;
@@ -62,8 +62,8 @@
         /* المعثرات */
         .obstacle {
             position: absolute;
-            width: 120px; /* تكبير المعثرات */
-            height: 60px; /* تكبير المعثرات */
+            width: 120px; /* حجم المعثرات */
+            height: 60px; /* حجم المعثرات */
             background-color: #f44336; /* لون المعثرات */
             border-radius: 5px;
             top: -60px;
@@ -108,7 +108,7 @@
         let obstacles = [];
         let obstacleInterval;
         let moveInterval;
-        let speed = 5; // زيادة السرعة الأساسية
+        let speed = 10; // زيادة السرعة الأساسية
 
         // بدء اللعبة
         startButton.addEventListener("click", () => {
@@ -122,10 +122,10 @@
             isGameRunning = true;
             ballPositionX = gameContainer.clientWidth / 2;
             ball.style.left = ballPositionX + "px";
-            speed = 5; // إعادة تعيين السرعة
+            speed = 10; // إعادة تعيين السرعة
 
             obstacles = [];
-            obstacleInterval = setInterval(createObstacle, 2000);
+            obstacleInterval = setInterval(createObstacle, 1000); // زيادة عدد المعثرات
             moveInterval = setInterval(moveObstacles, 20);
         }
 
