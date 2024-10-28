@@ -71,8 +71,8 @@
 
         .fixedObstacle {
             position: absolute;
-            width: 30px; /* جعلها أضيق */
-            height: 200px; /* ارتفاع ثابت للأجسام */
+            width: 200px; /* جعل العرض أكبر */
+            height: 80px; /* ارتفاع ثابت للأجسام */
             background-color: #f44336;
             transition: background-color 0.3s;
         }
@@ -90,7 +90,7 @@
         }
 
         #gameOverMessage {
-            display: none; /* إخفاء رسالة الخسارة */
+            display: none;
             position: absolute;
             top: 50%;
             left: 50%;
@@ -134,6 +134,7 @@
         let isGameRunning = false;
         let obstacles = [];
         let obstacleInterval;
+        let moveInterval;
         let speed = 10;
         let score = 0;
         let isDragging = false;
@@ -141,6 +142,7 @@
         startButton.addEventListener("click", () => {
             startButton.style.display = "none";
             gameContainer.style.display = "block";
+            gameOverMessage.style.display = "none";
             score = 0; // إعادة تعيين النقاط عند بدء اللعبة
             scoreDisplay.textContent = `النقاط: ${score}`;
             startGame();
@@ -151,7 +153,6 @@
             obstacles = [];
             obstacleInterval = setInterval(createObstacle, 1000);
             moveInterval = setInterval(moveObstacles, 20);
-            changeBackgroundColor();
         }
 
         function endGame() {
@@ -172,6 +173,15 @@
             obstacles.push(obstacle);
         }
 
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
         function moveObstacles() {
             if (!isGameRunning) return;
 
@@ -184,6 +194,11 @@
                     obstacles = obstacles.filter(o => o !== obstacle);
                     score += 10; // زيادة النقاط عند تجنب العقبات
                     scoreDisplay.textContent = `النقاط: ${score}`;
+                    
+                    // تغيير لون الخلفية بشكل عشوائي عند الوصول إلى 100 نقطة
+                    if (score >= 100) {
+                        document.body.style.backgroundColor = getRandomColor(); // تغيير اللون إلى لون عشوائي
+                    }
                 }
 
                 // إصلاح منطق الاصطدام
@@ -198,17 +213,6 @@
                     endGame();
                 }
             });
-        }
-
-        function changeBackgroundColor() {
-            setInterval(() => {
-                if (isGameRunning) {
-                    if (score >= 100) {
-                        document.body.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
-                        score = 0; // إعادة تعيين النقاط بعد تغيير اللون
-                    }
-                }
-            }, 1000);
         }
 
         // دعم اللمس لتحريك الكرة
