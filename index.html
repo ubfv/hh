@@ -22,7 +22,7 @@
             padding: 15px 30px;
             font-size: 20px;
             color: #fff;
-            background-color: #ff5722; /* لون زري فاتح */
+            background-color: #ff5722; /* لون زر فاتح */
             border: none;
             border-radius: 10px;
             cursor: pointer;
@@ -39,7 +39,7 @@
             position: relative;
             width: 80vw;
             height: 70vh;
-            background-color: #64b5f6; /* لون مميز للخلفية الداخلية (تغيير اللون) */
+            background-color: #ffcccb; /* لون الخلفية الداخلية بدلاً من الأزرق */
             overflow: hidden;
             border-radius: 20px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
@@ -52,7 +52,7 @@
             left: 50%;
             width: 100px; /* تكبير حجم الكرة */
             height: 100px; /* تكبير حجم الكرة */
-            background-color: #ff4081; /* لون الكرة (تغيير اللون إلى وردي فاتح) */
+            background-color: #ff69b4; /* تغيير لون الكرة إلى وردي فاتح */
             border-radius: 50%;
             transform: translateX(-50%);
             cursor: pointer;
@@ -105,11 +105,11 @@
         
         let isGameRunning = false;
         let ballPositionX = gameContainer.clientWidth / 2;
-        let ballPositionY = gameContainer.clientHeight - 100; // بدء الكرة من الأسفل
+        let ballPositionY = gameContainer.clientHeight - 100; // ضبط موضع الكرة
         let obstacles = [];
         let obstacleInterval;
         let moveInterval;
-        let speed = 10; // زيادة السرعة
+        let speed = 8; // زيادة السرعة الأساسية
 
         // بدء اللعبة
         startButton.addEventListener("click", () => {
@@ -122,12 +122,13 @@
         function startGame() {
             isGameRunning = true;
             ballPositionX = gameContainer.clientWidth / 2;
-            ballPositionY = gameContainer.clientHeight - 100; // إعادة وضع الكرة
+            ballPositionY = gameContainer.clientHeight - 100;
             ball.style.left = ballPositionX + "px";
-            ball.style.bottom = 50 + "px"; // وضع الكرة
+            ball.style.bottom = ballPositionY + "px"; // ضبط موضع الكرة
+            speed = 8; // إعادة تعيين السرعة
 
             obstacles = [];
-            obstacleInterval = setInterval(createObstacle, 1000); // زيادة عدد المعثرات
+            obstacleInterval = setInterval(createObstacle, 2000);
             moveInterval = setInterval(moveObstacles, 20);
         }
 
@@ -181,33 +182,34 @@
         document.addEventListener("touchmove", dragBall);
 
         let isDragging = false;
+        let offsetY = 0; // لحساب المسافة العمودية
 
         function startDrag(event) {
             isDragging = true;
             event.preventDefault(); // منع التحديد النصي
+            offsetY = event.touches[0].clientY - ballPositionY; // حفظ المسافة العمودية
         }
 
         function dragBall(event) {
             if (isDragging && isGameRunning) {
                 const containerRect = gameContainer.getBoundingClientRect();
                 let newPositionX = event.touches[0].clientX - containerRect.left - ball.clientWidth / 2;
-                let newPositionY = event.touches[0].clientY - containerRect.top - ball.clientHeight / 2;
+                let newPositionY = containerRect.bottom - event.touches[0].clientY - offsetY; // حساب موضع Y
 
                 // تأكيد أن الكرة لا تخرج عن حدود الحاوية
                 if (newPositionX < 0) newPositionX = 0;
                 if (newPositionX > gameContainer.clientWidth - ball.clientWidth) {
                     newPositionX = gameContainer.clientWidth - ball.clientWidth;
                 }
-
-                if (newPositionY < 0) newPositionY = 0; // لا تخرج للأعلى
+                if (newPositionY < 0) newPositionY = 0; // حدود أعلى
                 if (newPositionY > gameContainer.clientHeight - ball.clientHeight) {
-                    newPositionY = gameContainer.clientHeight - ball.clientHeight; // لا تخرج للأسفل
+                    newPositionY = gameContainer.clientHeight - ball.clientHeight; // حدود أسفل
                 }
 
                 ballPositionX = newPositionX;
-                ballPositionY = newPositionY; // ضبط الوضع العمودي
+                ballPositionY = newPositionY;
                 ball.style.left = ballPositionX + "px";
-                ball.style.bottom = (gameContainer.clientHeight - ballPositionY) + "px"; // تحديث الموضع العمودي
+                ball.style.bottom = ballPositionY + "px"; // ضبط موضع الكرة
             }
         }
 
