@@ -230,7 +230,7 @@ function moveObstacles() {
             }
         }
 
-        // منطق الاصطدام الجديد
+        // منطق الاصطدام لجميع الاتجاهات
         const ballRect = ball.getBoundingClientRect();
         const obstacleRect = obstacle.getBoundingClientRect();
 
@@ -238,7 +238,20 @@ function moveObstacles() {
         const overlapY = ballRect.bottom > obstacleRect.top && ballRect.top < obstacleRect.bottom;
 
         if (overlapX && overlapY) {
-            endGame();
+            // حساب النقاط المتبقية للدخول بين العقبات
+            const ballCenterX = ballRect.left + (ballRect.width / 2);
+            const ballCenterY = ballRect.top + (ballRect.height / 2);
+            const obstacleCenterX = obstacleRect.left + (obstacleRect.width / 2);
+            const obstacleCenterY = obstacleRect.top + (obstacleRect.height / 2);
+
+            const dx = ballCenterX - obstacleCenterX;
+            const dy = ballCenterY - obstacleCenterY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const minDistance = (ballRect.width / 2) + (obstacleRect.width / 2); // المسافة الدنيا للاصطدام
+
+            if (distance < minDistance) {
+                endGame();
+            }
         }
     });
 }
@@ -295,3 +308,4 @@ function moveObstacles() {
     </script>
 </body>
 </html>
+
