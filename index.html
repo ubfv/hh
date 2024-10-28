@@ -145,8 +145,8 @@
         function createObstacle() {
             const obstacle = document.createElement("div");
             obstacle.classList.add("obstacle");
-            obstacle.style.left = "50%"; // جعل العقبة في المنتصف
-            obstacle.style.transform = "translateX(-50%)"; // لتكون في منتصف الشاشة
+            const randomX = Math.random() * (gameContainer.clientWidth - 60); // مكان عشوائي في العرض
+            obstacle.style.left = randomX + "px"; // وضع العقبة في موقع عشوائي
             obstacle.style.top = "-40px"; // تظهر من أعلى الشاشة
             gameContainer.appendChild(obstacle);
             obstacles.push(obstacle);
