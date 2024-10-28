@@ -39,7 +39,7 @@
             position: relative;
             width: 80vw;
             height: 70vh;
-            background-color: #fff;
+            background-color: #b3e5fc; /* لون مميز للخلفية الداخلية */
             overflow: hidden;
             border-radius: 20px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
@@ -50,8 +50,8 @@
             position: absolute;
             bottom: 50px;
             left: 50%;
-            width: 50px;
-            height: 50px;
+            width: 70px; /* تكبير حجم الكرة */
+            height: 70px; /* تكبير حجم الكرة */
             background-color: #4caf50;
             border-radius: 50%;
             transform: translateX(-50%);
@@ -61,8 +61,8 @@
         /* المعثرات */
         .obstacle {
             position: absolute;
-            width: 70px;
-            height: 30px;
+            width: 90px; /* تكبير المعثرات */
+            height: 40px; /* تكبير المعثرات */
             background-color: #f44336;
             border-radius: 5px;
             top: -50px;
@@ -124,6 +124,7 @@
 
             ball.addEventListener("mousedown", startDrag);
             document.addEventListener("mouseup", endDrag);
+            document.addEventListener("mousemove", dragBall); // نقل السحب إلى مستوى المستند
         }
 
         function endGame() {
@@ -136,12 +137,13 @@
             startButton.style.display = "block";
             ball.removeEventListener("mousedown", startDrag);
             document.removeEventListener("mouseup", endDrag);
+            document.removeEventListener("mousemove", dragBall);
         }
 
         function createObstacle() {
             const obstacle = document.createElement("div");
             obstacle.classList.add("obstacle");
-            obstacle.style.left = Math.random() * (gameContainer.clientWidth - 70) + "px";
+            obstacle.style.left = Math.random() * (gameContainer.clientWidth - 90) + "px";
             obstacle.style.backgroundColor = getRandomColor(); // لون عشوائي للمعثرة
             gameContainer.appendChild(obstacle);
             obstacles.push(obstacle);
@@ -181,7 +183,7 @@
 
         function startDrag(event) {
             isDragging = true;
-            document.addEventListener("mousemove", dragBall);
+            event.preventDefault(); // منع التحديد النصي
         }
 
         function dragBall(event) {
@@ -202,7 +204,6 @@
 
         function endDrag() {
             isDragging = false;
-            document.removeEventListener("mousemove", dragBall);
         }
 
         // وظيفة للحصول على لون عشوائي
