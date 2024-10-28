@@ -25,8 +25,8 @@
             border-radius: 10px;
             cursor: pointer;
             transition: background-color 0.3s;
-            position: absolute; /* اجعل الزر في مكان محدد */
-            top: 20px; /* حرك الزر للأعلى */
+            position: absolute;
+            top: 20px;
             left: 50%;
             transform: translateX(-50%);
         }
@@ -79,16 +79,25 @@
 
         #leftObstacle {
             left: 0;
-            top: 50%; /* ضعها في المنتصف */
+            top: 50%; /* وضعها في المنتصف عمودياً */
             transform: translateY(-50%);
         }
 
         #rightObstacle {
             right: 0;
-            top: 50%; /* ضعها في المنتصف */
+            top: 50%; /* وضعها في المنتصف عمودياً */
             transform: translateY(-50%);
         }
 
+        #scoreDisplay {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            color: #fff;
+        }
+        
         #gameOverMessage {
             display: none;
             position: absolute;
@@ -102,15 +111,6 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-        }
-        
-        #scoreDisplay {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 24px;
-            color: #fff;
         }
     </style>
 </head>
@@ -141,15 +141,22 @@
         startButton.addEventListener("click", () => {
             startButton.style.display = "none";
             gameContainer.style.display = "block";
-            gameOverMessage.style.display = "none";
-            score = 0; // إعادة تعيين النقاط عند بدء اللعبة
-            scoreDisplay.textContent = `النقاط: ${score}`;
+            resetGame(); // إعادة تعيين اللعبة
             startGame();
         });
 
+        function resetGame() {
+            score = 0; // إعادة تعيين النقاط عند بدء اللعبة
+            scoreDisplay.textContent = `النقاط: ${score}`;
+            gameOverMessage.style.display = "none";
+            obstacles.forEach(obstacle => obstacle.remove());
+            obstacles = []; // إعادة تعيين العقبات
+            document.getElementById("leftObstacle").style.display = "block"; // إظهار العقبات المثبتة
+            document.getElementById("rightObstacle").style.display = "block"; // إظهار العقبات المثبتة
+        }
+
         function startGame() {
             isGameRunning = true;
-            obstacles = [];
             obstacleInterval = setInterval(createObstacle, 1000);
             moveInterval = setInterval(moveObstacles, 20);
             changeBackgroundColor();
@@ -161,8 +168,11 @@
             clearInterval(moveInterval);
             obstacles.forEach(obstacle => obstacle.remove());
             obstacles = [];
-            gameOverMessage.style.display = "block";
+            gameOverMessage.style.display = "block"; // إظهار رسالة الخسارة
             startButton.style.display = "block";
+            // إخفاء العقبات المثبتة
+            document.getElementById("leftObstacle").style.display = "none";
+            document.getElementById("rightObstacle").style.display = "none";
         }
 
         function createObstacle() {
