@@ -17,15 +17,6 @@
             overflow: hidden;
         }
 
-        #welcomeMessage {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            color: #fff;
-            margin-bottom: 20px;
-        }
-
         #startButton {
             padding: 15px 30px;
             font-size: 20px;
@@ -35,9 +26,10 @@
             border-radius: 10px;
             cursor: pointer;
             transition: background-color 0.3s;
-            margin-top: 10px;
+            position: absolute;
+            top: 10px; /* زر ابدأ في الأعلى */
         }
-
+        
         #startButton:hover {
             background-color: #e64a19;
         }
@@ -45,8 +37,8 @@
         #gameContainer {
             display: none;
             position: relative;
-            width: 80vw;
-            height: 80vh;
+            width: 90vw;
+            height: 70vh;
             background-color: #64b5f6;
             overflow: hidden;
             border-radius: 20px;
@@ -57,8 +49,8 @@
             position: absolute;
             bottom: 50px;
             left: 50%;
-            width: 60px;
-            height: 60px;
+            width: 80px;
+            height: 80px;
             background-color: #ff4081;
             border-radius: 50%;
             transform: translateX(-50%);
@@ -68,11 +60,20 @@
 
         .obstacle {
             position: absolute;
-            width: 80px;
-            height: 40px;
+            width: 100px;
+            height: 50px;
             background-color: #f44336;
             border-radius: 5px;
             top: -60px;
+            transition: background-color 0.3s;
+        }
+
+        .chain {
+            position: absolute;
+            width: 10px;
+            height: 200px; /* ارتفاع السلسلة */
+            background-color: #000; /* لون السلسلة */
+            top: -200px;
             transition: background-color 0.3s;
         }
 
@@ -90,13 +91,22 @@
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
+
+        #score {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            color: #fff;
+            z-index: 1;
+        }
     </style>
 </head>
 <body>
-    <div id="welcomeMessage">
-        <h1>مرحبا بك في لعبة تجاوز المعثرات</h1>
-        <button id="startButton">ابدأ</button>
-    </div>
+    <div id="score">النقاط: 0</div>
+    <button id="startButton">ابدأ</button>
+
     <div id="gameContainer">
         <div id="ball"></div>
         <div id="gameOverMessage">لقد خسرت! اضغط ابدأ لتجرب مرة أخرى.</div>
@@ -104,30 +114,41 @@
 
     <script>
         const startButton = document.getElementById("startButton");
-        const welcomeMessage = document.getElementById("welcomeMessage");
         const gameContainer = document.getElementById("gameContainer");
         const ball = document.getElementById("ball");
         const gameOverMessage = document.getElementById("gameOverMessage");
+        const scoreDisplay = document.getElementById("score");
 
         let isGameRunning = false;
+        let ballPositionX = gameContainer.clientWidth / 2;
+        let ballPositionY = gameContainer.clientHeight - 100;
         let obstacles = [];
+        let chains = [];
         let obstacleInterval;
         let moveInterval;
-        let speed = 12;
-        let spawnRate = 500; // زيادة سرعة ظهور المجسمات
-        let isDragging = false;
+        let speed = 10;
+        let score = 0;
 
+        // بدء اللعبة
         startButton.addEventListener("click", () => {
-            welcomeMessage.style.display = "none";
+            startButton.style.display = "none";
             gameContainer.style.display = "block";
             gameOverMessage.style.display = "none";
+            score = 0; // إعادة تعيين النقاط
+            scoreDisplay.innerText = `النقاط: ${score}`;
             startGame();
         });
 
         function startGame() {
             isGameRunning = true;
+            ballPositionX = gameContainer.clientWidth / 2;
+            ballPositionY = gameContainer.clientHeight - 100;
+            ball.style.left = ballPositionX + "px";
+            ball.style.bottom = 50 + "px";
+
             obstacles = [];
-            obstacleInterval = setInterval(createObstacle, spawnRate);
+            chains = [];
+            obstacleInterval = setInterval(createObstacle, 1000);
             moveInterval = setInterval(moveObstacles, 20);
         }
 
@@ -136,13 +157,11 @@
             clearInterval(obstacleInterval);
             clearInterval(moveInterval);
             obstacles.forEach(obstacle => obstacle.remove());
+            chains.forEach(chain => chain.remove());
             obstacles = [];
+            chains = [];
             gameOverMessage.style.display = "block";
             startButton.style.display = "block";
-            startButton.style.position = "absolute";
-            startButton.style.top = "10px"; // ظهور الزر في الأعلى بعد الخسارة
-            startButton.style.left = "50%";
-            startButton.style.transform = "translateX(-50%)";
         }
 
         function createObstacle() {
@@ -151,6 +170,15 @@
             obstacle.style.left = Math.random() * (gameContainer.clientWidth - 100) + "px";
             gameContainer.appendChild(obstacle);
             obstacles.push(obstacle);
+            score++; // زيادة النقاط
+            scoreDisplay.innerText = `النقاط: ${score}`;
+
+            // إنشاء السلسلة بجانب العقبة
+            const chain = document.createElement("div");
+            chain.classList.add("chain");
+            chain.style.left = parseFloat(obstacle.style.left) + "px";
+            gameContainer.appendChild(chain);
+            chains.push(chain);
         }
 
         function moveObstacles() {
@@ -165,43 +193,69 @@
                     obstacles = obstacles.filter(o => o !== obstacle);
                 }
 
-                const ballRect = ball.getBoundingClientRect();
-                const obstacleRect = obstacle.getBoundingClientRect();
-                if (
-                    ballRect.left < obstacleRect.right &&
-                    ballRect.right > obstacleRect.left &&
-                    ballRect.bottom > obstacleRect.top &&
-                    ballRect.top < obstacleRect.bottom
-                ) {
-                    endGame();
+                // التحقق من الاصطدام
+                checkCollision(ball, obstacle, endGame);
+            });
+
+            chains.forEach(chain => {
+                const chainTop = parseFloat(chain.style.top || "-200px") + speed;
+                chain.style.top = chainTop + "px";
+
+                if (chainTop > gameContainer.clientHeight) {
+                    chain.remove();
+                    chains = chains.filter(c => c !== chain);
                 }
+
+                // التحقق من الاصطدام مع السلسلة
+                checkCollision(ball, chain, endGame);
             });
         }
 
-        ball.addEventListener("touchstart", (event) => {
-            isDragging = true;
-        });
+        function checkCollision(ball, element, callback) {
+            const ballRect = ball.getBoundingClientRect();
+            const elementRect = element.getBoundingClientRect();
 
-        ball.addEventListener("touchmove", (event) => {
-            if (isDragging) {
-                const touch = event.touches[0];
-                const containerRect = gameContainer.getBoundingClientRect();
-                const ballRadius = ball.clientWidth / 2;
-
-                let newLeft = touch.clientX - containerRect.left - ballRadius;
-                let newTop = touch.clientY - containerRect.top - ballRadius;
-
-                newLeft = Math.max(0, Math.min(newLeft, gameContainer.clientWidth - ball.clientWidth));
-                newTop = Math.max(0, Math.min(newTop, gameContainer.clientHeight - ball.clientHeight));
-
-                ball.style.left = newLeft + "px";
-                ball.style.top = newTop + "px";
+            // التحقق من الاصطدام
+            if (
+                ballRect.left < elementRect.right &&
+                ballRect.right > elementRect.left &&
+                ballRect.top < elementRect.bottom &&
+                ballRect.bottom > elementRect.top
+            ) {
+                callback();
             }
-        });
+        }
 
-        ball.addEventListener("touchend", () => {
+        // التحكم بالكرة عن طريق السحب
+        ball.addEventListener("touchstart", startDrag);
+        document.addEventListener("touchend", endDrag);
+        document.addEventListener("touchmove", dragBall);
+
+        let isDragging = false;
+
+        function startDrag(event) {
+            isDragging = true;
+            event.preventDefault();
+        }
+
+        function dragBall(event) {
+            if (isDragging && isGameRunning) {
+                const containerRect = gameContainer.getBoundingClientRect();
+                let newPositionX = event.touches[0].clientX - containerRect.left - ball.clientWidth / 2;
+
+                if (newPositionX < 0) newPositionX = 0;
+                if (newPositionX > gameContainer.clientWidth - ball.clientWidth) {
+                    newPositionX = gameContainer.clientWidth - ball.clientWidth;
+                }
+
+                ballPositionX = newPositionX;
+                ball.style.left = ballPositionX + "px";
+            }
+        }
+
+        function endDrag() {
             isDragging = false;
-        });
+        }
     </script>
 </body>
-    </html>
+</html>
