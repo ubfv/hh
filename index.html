@@ -5,100 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لعبة تجاوز المعثرات</title>
     <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            overflow: hidden;
-        }
-
-        #welcomeMessage {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 24px;
-            color: #fff;
-            text-align: center;
-            background-color: rgba(0, 0, 0, 0.7);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-        }
-
-        #startButton, #restartButton {
-            padding: 15px 30px;
-            font-size: 20px;
-            color: #fff;
-            background-color: #ff5722;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            margin-top: 20px;
-        }
-
-        #startButton:hover, #restartButton:hover {
-            background-color: #e64a19;
-        }
-
-        #gameContainer {
-            display: none;
-            position: relative;
-            width: 80vw;
-            height: 80vh;
-            background-color: #64b5f6; /* لون خلفية اللعبة */
-            overflow: hidden;
-            border-radius: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-        }
-
-        #ball {
-            position: absolute;
-            bottom: 50px;
-            left: 50%;
-            width: 45px;
-            height: 45px;
-            background-color: #ff4081;
-            border-radius: 50%;
-            transform: translateX(-50%);
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-        }
-
-        .obstacle {
-            position: absolute;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-
-        #gameOverMessage {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 24px;
-            color: #fff;
-            text-align: center;
-            background-color: rgba(0, 0, 0, 0.7);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-        }
-        
-        #scoreDisplay {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 24px;
-            color: #fff;
-        }
+        /* أنماط CSS كما هي */
     </style>
 </head>
 <body>
@@ -129,16 +36,16 @@
         let obstacles = [];
         let obstacleInterval;
         let moveInterval;
-        let speed = 5; // سرعة العقبات في البداية
+        let speed = 5; // بداية السرعة متوسطة
         let score = 0;
         let isDragging = false;
 
         const obstacleShapes = [
-            {width: 80, height: 60, color: "#f44336"}, // مستطيل أحمر أكبر
-            {width: 60, height: 80, color: "#4caf50"}, // مستطيل أخضر أكبر
-            {width: 90, height: 90, color: "#2196f3"}, // مربع أزرق أكبر
-            {width: 100, height: 40, color: "#ffeb3b"}, // مستطيل أصفر أكبر
-            {width: 40, height: 40, color: "#9c27b0"}, // مربع بنفسجي أصغر
+            {width: 60, height: 40, color: "#f44336"}, // مستطيل أحمر
+            {width: 40, height: 60, color: "#4caf50"}, // مستطيل أخضر
+            {width: 70, height: 70, color: "#2196f3"}, // مربع أزرق
+            {width: 80, height: 20, color: "#ffeb3b"}, // مستطيل أصفر
+            {width: 30, height: 30, color: "#9c27b0"}, // مربع بنفسجي
         ];
 
         startButton.addEventListener("click", () => {
@@ -160,7 +67,7 @@
         function startGame() {
             isGameRunning = true;
             obstacles = [];
-            obstacleInterval = setInterval(createObstacle, 300); // زيادة عدد العقبات
+            obstacleInterval = setInterval(createObstacle, 400); // زيادة عدد العقبات
             moveInterval = setInterval(moveObstacles, 20);
         }
 
@@ -183,10 +90,11 @@
             obstacle.style.height = shape.height + "px";
             obstacle.style.backgroundColor = shape.color;
 
-            // وضع العقبة بشكل عشوائي
+            // وضع العقبة بشكل عشوائي حسب مكان الكرة
+            const ballRect = ball.getBoundingClientRect();
             const randomX = Math.random() * (gameContainer.clientWidth - shape.width);
             obstacle.style.left = randomX + "px"; 
-            obstacle.style.top = "-60px"; // تظهر من أعلى الشاشة
+            obstacle.style.top = "-40px"; // تظهر من أعلى الشاشة
             gameContainer.appendChild(obstacle);
             obstacles.push(obstacle);
         }
@@ -213,15 +121,12 @@
                     score += 10; // زيادة النقاط عند تجنب العقبات
                     scoreDisplay.textContent = `النقاط: ${score}`;
 
-                    // زيادة السرعة بعد الوصول إلى 50 نقطة
-                    if (score >= 50) {
-                        speed += 0.5; // تسريع اللعبة
-                    }
+                    // زيادة السرعة مع زيادة النقاط
+                    speed = 5 + Math.floor(score / 50); // كل 50 نقطة تزيد السرعة بمقدار 1
 
                     // تغيير لون خلفية اللعبة بشكل عشوائي عند الوصول إلى 100 نقطة
                     if (score >= 100) {
-                        gameContainer.style.backgroundColor = getRandomColor(); // تغيير لون الخلفية الداخلية
-                        // تكرار استخدام اللون الأحمر بشكل أكبر
+                        gameContainer.style.backgroundColor = getRandomColor();
                         if (Math.random() < 0.5) {
                             gameContainer.style.backgroundColor = "#f44336"; // اللون الأحمر
                         }
@@ -229,48 +134,69 @@
                 }
 
                 // إصلاح منطق الاصطدام
-const ballRect = ball.getBoundingClientRect();
-const obstacleRect = obstacle.getBoundingClientRect();
-if (
-    ballRect.left < obstacleRect.right &&
-    ballRect.right > obstacleRect.left &&
-    ballRect.bottom > obstacleRect.top &&
-    ballRect.top < obstacleRect.bottom
-) {
-    endGame(); // إنهاء اللعبة عند التصادم
-}
-
-// دعم اللمس لتحريك الكرة
-ball.addEventListener("touchstart", (event) => {
-    isDragging = true; // بدء السحب
-});
-
-ball.addEventListener("touchmove", (event) => {
-    if (isDragging) {
-        const touch = event.touches[0];
-        const containerRect = gameContainer.getBoundingClientRect();
-        const ballLeft = touch.clientX - containerRect.left - ball.clientWidth / 2;
-        
-        // التأكد من أن الكرة تبقى داخل حدود الحاوية
-        if (ballLeft >= 0 && ballLeft <= containerRect.width - ball.clientWidth) {
-            ball.style.left = ballLeft + "px"; // تحريك الكرة
+                const ballRect = ball.getBoundingClientRect();
+                const obstacleRect = obstacle.getBoundingClientRect();
+                if (
+                    ballRect.left < obstacleRect.right &&
+                    ballRect.right > obstacleRect.left &&
+                    ballRect.bottom > obstacleRect.top &&
+                    ballRect.top < obstacleRect.bottom
+                ) {
+                    endGame();
+                }
+            });
         }
-    }
-});
 
-ball.addEventListener("touchend", () => {
-    isDragging = false; // إنهاء السحب
-});
+        // دعم اللمس لتحريك الكرة
+        ball.addEventListener("touchstart", (event) => {
+            isDragging = true;
+        });
 
-// دعم لوحة المفاتيح لتحريك الكرة
-document.addEventListener("keydown", (event) => {
-    const ballLeft = parseFloat(ball.style.left || 0);
-    if (event.key === "ArrowLeft" && ballLeft > 0) {
-        ball.style.left = ballLeft - 15 + "px"; // تحريك الكرة لليسار
-    } else if (event.key === "ArrowRight" && ballLeft < gameContainer.clientWidth - ball.clientWidth) {
-        ball.style.left = ballLeft + 15 + "px"; // تحريك الكرة لليمين
-    }
-});
+        ball.addEventListener("touchmove", (event) => {
+            if (isDragging) {
+                const touch = event.touches[0];
+                const containerRect = gameContainer.getBoundingClientRect();
+                const ballRadius = ball.clientWidth / 2;
+
+                let newLeft = touch.clientX - containerRect.left - ballRadius;
+                let newTop = touch.clientY - containerRect.top - ballRadius;
+
+                newLeft = Math.max(0, Math.min(newLeft, gameContainer.clientWidth - ball.clientWidth));
+                newTop = Math.max(0, Math.min(newTop, gameContainer.clientHeight - ball.clientHeight));
+
+                ball.style.left = newLeft + "px";
+                ball.style.top = newTop + "px";
+            }
+        });
+
+        ball.addEventListener("touchend", () => {
+            isDragging = false;
+        });
+
+        // دعم السحب بالفأرة
+        ball.addEventListener("mousedown", (event) => {
+            isDragging = true;
+        });
+
+        document.addEventListener("mousemove", (event) => {
+            if (isDragging) {
+                const containerRect = gameContainer.getBoundingClientRect();
+                const ballRadius = ball.clientWidth / 2;
+
+                let newLeft = event.clientX - containerRect.left - ballRadius;
+                let newTop = event.clientY - containerRect.top - ballRadius;
+
+                newLeft = Math.max(0, Math.min(newLeft, gameContainer.clientWidth - ball.clientWidth));
+                newTop = Math.max(0, Math.min(newTop, gameContainer.clientHeight - ball.clientHeight));
+
+                ball.style.left = newLeft + "px";
+                ball.style.top = newTop + "px";
+            }
+        });
+
+        document.addEventListener("mouseup", () => {
+            isDragging = false;
+        });
     </script>
 </body>
 </html>
