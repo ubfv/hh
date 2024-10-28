@@ -2,7 +2,7 @@
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, content-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لعبة تجاوز المعثرات</title>
     <style>
         body {
@@ -16,6 +16,20 @@
             overflow: hidden;
         }
 
+        #welcomeMessage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            color: #fff;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
         #startButton {
             padding: 15px 30px;
             font-size: 20px;
@@ -25,10 +39,7 @@
             border-radius: 10px;
             cursor: pointer;
             transition: background-color 0.3s;
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+            margin-top: 20px;
         }
 
         #startButton:hover {
@@ -61,9 +72,6 @@
 
         .obstacle {
             position: absolute;
-            width: 60px; /* عرض العقبات */
-            height: 40px; /* ارتفاع ثابت للعقبات */
-            background-color: #f44336; /* لون العقبة الأحمر */
             border-radius: 5px;
             transition: background-color 0.3s;
         }
@@ -94,7 +102,11 @@
     </style>
 </head>
 <body>
-    <button id="startButton">ابدأ</button>
+    <div id="welcomeMessage">
+        مرحباً بك في لعبة تجاوز المعثرات!<br> حاول تجنب العقبات وحقق أعلى نتيجة ممكنة!
+        <div id="startButton">ابدأ اللعب</div>
+    </div>
+
     <div id="gameContainer">
         <div id="ball"></div>
         <div id="scoreDisplay">النقاط: 0</div>
@@ -107,17 +119,26 @@
         const ball = document.getElementById("ball");
         const gameOverMessage = document.getElementById("gameOverMessage");
         const scoreDisplay = document.getElementById("scoreDisplay");
+        const welcomeMessage = document.getElementById("welcomeMessage");
 
         let isGameRunning = false;
         let obstacles = [];
         let obstacleInterval;
         let moveInterval;
-        let speed = 15; // زيادة سرعة العقبات
+        let speed = 15; // سرعة العقبات
         let score = 0;
         let isDragging = false;
 
+        const obstacleShapes = [
+            {width: 60, height: 40, color: "#f44336"}, // مستطيل أحمر
+            {width: 40, height: 60, color: "#4caf50"}, // مستطيل أخضر
+            {width: 70, height: 70, color: "#2196f3"}, // مربع أزرق
+            {width: 80, height: 20, color: "#ffeb3b"}, // مستطيل أصفر
+            {width: 30, height: 30, color: "#9c27b0"}, // مربع بنفسجي
+        ];
+
         startButton.addEventListener("click", () => {
-            startButton.style.display = "none";
+            welcomeMessage.style.display = "none";
             gameContainer.style.display = "block";
             gameOverMessage.style.display = "none";
             score = 0; // إعادة تعيين النقاط عند بدء اللعبة
@@ -140,18 +161,20 @@
             obstacles = [];
             gameOverMessage.style.display = "block";
             startButton.style.display = "block";
+            welcomeMessage.style.display = "block";
         }
 
         function createObstacle() {
+            const shape = obstacleShapes[Math.floor(Math.random() * obstacleShapes.length)];
             const obstacle = document.createElement("div");
             obstacle.classList.add("obstacle");
+            obstacle.style.width = shape.width + "px";
+            obstacle.style.height = shape.height + "px";
+            obstacle.style.backgroundColor = shape.color;
 
-            // تحديد مكان العقبة بناءً على موقع الكرة
-            const ballRect = ball.getBoundingClientRect();
-            const randomX = Math.random() * (gameContainer.clientWidth - 60); // مكان عشوائي في العرض
-            const obstacleX = Math.abs(randomX - ballRect.left) < 100 ? randomX + 100 : randomX; // تجنب المكان القريب من الكرة
-
-            obstacle.style.left = obstacleX + "px"; // وضع العقبة في موقع عشوائي
+            // وضع العقبة بشكل عشوائي
+            const randomX = Math.random() * (gameContainer.clientWidth - shape.width);
+            obstacle.style.left = randomX + "px"; 
             obstacle.style.top = "-40px"; // تظهر من أعلى الشاشة
             gameContainer.appendChild(obstacle);
             obstacles.push(obstacle);
@@ -226,6 +249,31 @@
         });
 
         ball.addEventListener("touchend", () => {
+            isDragging = false;
+        });
+
+        // دعم السحب بالفأرة
+        ball.addEventListener("mousedown", (event) => {
+            isDragging = true;
+        });
+
+        document.addEventListener("mousemove", (event) => {
+            if (isDragging) {
+                const containerRect = gameContainer.getBoundingClientRect();
+                const ballRadius = ball.clientWidth / 2;
+
+                let newLeft = event.clientX - containerRect.left - ballRadius;
+                let newTop = event.clientY - containerRect.top - ballRadius;
+
+                newLeft = Math.max(0, Math.min(newLeft, gameContainer.clientWidth - ball.clientWidth));
+                newTop = Math.max(0, Math.min(newTop, gameContainer.clientHeight - ball.clientHeight));
+
+                ball.style.left = newLeft + "px";
+                ball.style.top = newTop + "px";
+            }
+        });
+
+        document.addEventListener("mouseup", () => {
             isDragging = false;
         });
     </script>
