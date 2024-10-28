@@ -30,7 +30,7 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
 
-        #startButton {
+        #startButton, #restartButton {
             padding: 15px 30px;
             font-size: 20px;
             color: #fff;
@@ -42,7 +42,7 @@
             margin-top: 20px;
         }
 
-        #startButton:hover {
+        #startButton:hover, #restartButton:hover {
             background-color: #e64a19;
         }
 
@@ -110,7 +110,10 @@
     <div id="gameContainer">
         <div id="ball"></div>
         <div id="scoreDisplay">النقاط: 0</div>
-        <div id="gameOverMessage">لقد خسرت! اضغط ابدأ لتجرب مرة أخرى.</div>
+        <div id="gameOverMessage">
+            لقد خسرت!<br>
+            <div id="restartButton">إعادة اللعب</div>
+        </div>
     </div>
 
     <script>
@@ -120,6 +123,7 @@
         const gameOverMessage = document.getElementById("gameOverMessage");
         const scoreDisplay = document.getElementById("scoreDisplay");
         const welcomeMessage = document.getElementById("welcomeMessage");
+        const restartButton = document.getElementById("restartButton");
 
         let isGameRunning = false;
         let obstacles = [];
@@ -146,6 +150,13 @@
             startGame();
         });
 
+        restartButton.addEventListener("click", () => {
+            gameOverMessage.style.display = "none";
+            score = 0; // إعادة تعيين النقاط عند إعادة اللعب
+            scoreDisplay.textContent = `النقاط: ${score}`;
+            startGame();
+        });
+
         function startGame() {
             isGameRunning = true;
             obstacles = [];
@@ -160,8 +171,8 @@
             obstacles.forEach(obstacle => obstacle.remove());
             obstacles = [];
             gameOverMessage.style.display = "block";
-            startButton.style.display = "block";
-            welcomeMessage.style.display = "block";
+            startButton.style.display = "none";
+            welcomeMessage.style.display = "none";
         }
 
         function createObstacle() {
