@@ -19,8 +19,8 @@
 
         /* زر البدء */
         #startButton {
-            padding: 20px 40px;
-            font-size: 24px;
+            padding: 15px 30px;
+            font-size: 20px;
             color: #fff;
             background-color: #ff6363;
             border: none;
@@ -37,10 +37,12 @@
         #gameContainer {
             display: none;
             position: relative;
-            width: 100vw;
-            height: 100vh;
+            width: 80vw;
+            height: 70vh;
             background-color: #fff;
             overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         }
 
         /* الكرة */
@@ -48,21 +50,23 @@
             position: absolute;
             bottom: 50px;
             left: 50%;
-            width: 30px;
-            height: 30px;
+            width: 50px;
+            height: 50px;
             background-color: #4caf50;
             border-radius: 50%;
             transform: translateX(-50%);
+            cursor: pointer;
         }
 
         /* المعثرات */
         .obstacle {
             position: absolute;
-            width: 50px;
-            height: 20px;
+            width: 70px;
+            height: 30px;
             background-color: #f44336;
             border-radius: 5px;
             top: -50px;
+            transition: background-color 0.3s;
         }
 
         /* رسالة الخسارة */
@@ -72,7 +76,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 36px;
+            font-size: 24px;
             color: #333;
         }
     </style>
@@ -94,10 +98,11 @@
         const gameOverMessage = document.getElementById("gameOverMessage");
         
         let isGameRunning = false;
-        let ballPositionX = 0;
+        let ballPositionX = gameContainer.clientWidth / 2;
         let obstacles = [];
         let obstacleInterval;
         let moveInterval;
+        let speed = 2; // السرعة الأساسية
 
         // بدء اللعبة
         startButton.addEventListener("click", () => {
@@ -111,12 +116,14 @@
             isGameRunning = true;
             ballPositionX = gameContainer.clientWidth / 2;
             ball.style.left = ballPositionX + "px";
+            speed = 2; // إعادة تعيين السرعة
 
             obstacles = [];
             obstacleInterval = setInterval(createObstacle, 2000);
-            moveInterval = setInterval(moveBall, 20);
+            moveInterval = setInterval(moveObstacles, 20);
 
-            document.addEventListener("keydown", moveBallWithArrows);
+            ball.addEventListener("mousedown", startDrag);
+            document.addEventListener("mouseup", endDrag);
         }
 
         function endGame() {
@@ -127,35 +134,27 @@
             obstacles = [];
             gameOverMessage.style.display = "block";
             startButton.style.display = "block";
-            document.removeEventListener("keydown", moveBallWithArrows);
-        }
-
-        function moveBallWithArrows(event) {
-            if (event.key === "ArrowRight") {
-                ballPositionX += 10;
-            } else if (event.key === "ArrowLeft") {
-                ballPositionX -= 10;
-            }
-            if (ballPositionX < 0) ballPositionX = 0;
-            if (ballPositionX > gameContainer.clientWidth - ball.clientWidth) {
-                ballPositionX = gameContainer.clientWidth - ball.clientWidth;
-            }
-            ball.style.left = ballPositionX + "px";
+            ball.removeEventListener("mousedown", startDrag);
+            document.removeEventListener("mouseup", endDrag);
         }
 
         function createObstacle() {
             const obstacle = document.createElement("div");
             obstacle.classList.add("obstacle");
-            obstacle.style.left = Math.random() * (gameContainer.clientWidth - 50) + "px";
+            obstacle.style.left = Math.random() * (gameContainer.clientWidth - 70) + "px";
+            obstacle.style.backgroundColor = getRandomColor(); // لون عشوائي للمعثرة
             gameContainer.appendChild(obstacle);
             obstacles.push(obstacle);
+
+            // زيادة السرعة كلما تقدمت في اللعبة
+            speed += 0.2;
         }
 
-        function moveBall() {
+        function moveObstacles() {
             if (!isGameRunning) return;
 
             obstacles.forEach(obstacle => {
-                const obstacleTop = parseFloat(obstacle.style.top || "-50px") + 5;
+                const obstacleTop = parseFloat(obstacle.style.top || "-50px") + speed;
                 obstacle.style.top = obstacleTop + "px";
 
                 if (obstacleTop > gameContainer.clientHeight) {
@@ -175,6 +174,45 @@
                     endGame();
                 }
             });
+        }
+
+        // التحكم بالكرة عن طريق السحب
+        let isDragging = false;
+
+        function startDrag(event) {
+            isDragging = true;
+            document.addEventListener("mousemove", dragBall);
+        }
+
+        function dragBall(event) {
+            if (isDragging && isGameRunning) {
+                const containerRect = gameContainer.getBoundingClientRect();
+                let newPositionX = event.clientX - containerRect.left - ball.clientWidth / 2;
+
+                // تأكيد أن الكرة لا تخرج عن حدود الحاوية
+                if (newPositionX < 0) newPositionX = 0;
+                if (newPositionX > gameContainer.clientWidth - ball.clientWidth) {
+                    newPositionX = gameContainer.clientWidth - ball.clientWidth;
+                }
+
+                ballPositionX = newPositionX;
+                ball.style.left = ballPositionX + "px";
+            }
+        }
+
+        function endDrag() {
+            isDragging = false;
+            document.removeEventListener("mousemove", dragBall);
+        }
+
+        // وظيفة للحصول على لون عشوائي
+        function getRandomColor() {
+            const letters = "0123456789ABCDEF";
+            let color = "#";
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
         }
     </script>
 </body>
