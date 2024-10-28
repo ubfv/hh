@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لعبة تجاوز المعثرات</title>
     <style>
-        /* تصميم الصفحة بألوان جديدة جذابة */
+        /* تصميم الصفحة بألوان جذابة */
         body {
             display: flex;
             justify-content: center;
@@ -13,7 +13,7 @@
             height: 100vh;
             margin: 0;
             font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #4a90e2 0%, #8e44ad 100%); /* لون خارجي جذاب */
+            background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%); /* لون خارجي جذاب */
             overflow: hidden;
         }
 
@@ -22,7 +22,7 @@
             padding: 15px 30px;
             font-size: 20px;
             color: #fff;
-            background-color: #27ae60; /* لون زر جديد */
+            background-color: #ff4b4b;
             border: none;
             border-radius: 10px;
             cursor: pointer;
@@ -30,16 +30,16 @@
         }
         
         #startButton:hover {
-            background-color: #219653; /* لون عند التحويم */
+            background-color: #ff1f1f;
         }
 
         /* حاوية اللعبة */
         #gameContainer {
             display: none;
             position: relative;
-            width: 60vw;  /* تصغير عرض حاوية اللعبة */
-            height: 50vh; /* تصغير ارتفاع حاوية اللعبة */
-            background-color: #f1c40f; /* لون مميز للخلفية الداخلية */
+            width: 80vw;
+            height: 70vh;
+            background-color: #87ceeb; /* لون مميز للخلفية الداخلية */
             overflow: hidden;
             border-radius: 20px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
@@ -48,11 +48,11 @@
         /* الكرة */
         #ball {
             position: absolute;
-            bottom: 30px; /* تقليل المسافة من الأسفل */
+            bottom: 50px;
             left: 50%;
-            width: 60px; /* تصغير حجم الكرة */
-            height: 60px; /* تصغير حجم الكرة */
-            background-color: #e67e22; /* لون الكرة */
+            width: 80px; /* تكبير حجم الكرة */
+            height: 80px; /* تكبير حجم الكرة */
+            background-color: #ffeb3b; /* لون الكرة */
             border-radius: 50%;
             transform: translateX(-50%);
             cursor: pointer;
@@ -62,11 +62,11 @@
         /* المعثرات */
         .obstacle {
             position: absolute;
-            width: 80px; /* تصغير المعثرات */
-            height: 40px; /* تصغير المعثرات */
-            background-color: #c0392b; /* لون المعثرات جديد */
+            width: 100px; /* تكبير المعثرات */
+            height: 50px; /* تكبير المعثرات */
+            background-color: #f44336;
             border-radius: 5px;
-            top: -40px;
+            top: -50px;
             transition: background-color 0.3s;
         }
 
@@ -78,9 +78,9 @@
             left: 50%;
             transform: translate(-50%, -50%);
             font-size: 24px;
-            color: #fff;
+            color: #333;
             text-align: center;
-            background-color: rgba(0, 0, 0, 0.7);
+            background-color: rgba(255, 255, 255, 0.8);
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
@@ -108,7 +108,7 @@
         let obstacles = [];
         let obstacleInterval;
         let moveInterval;
-        let speed = 1; // سرعة البداية
+        let speed = 2; // السرعة الأساسية
 
         // بدء اللعبة
         startButton.addEventListener("click", () => {
@@ -122,11 +122,16 @@
             isGameRunning = true;
             ballPositionX = gameContainer.clientWidth / 2;
             ball.style.left = ballPositionX + "px";
-            speed = 1; // إعادة تعيين السرعة
+            speed = 2; // إعادة تعيين السرعة
 
             obstacles = [];
             obstacleInterval = setInterval(createObstacle, 2000);
             moveInterval = setInterval(moveObstacles, 20);
+
+            // إضافة أحداث اللمس
+            ball.addEventListener("touchstart", startDrag);
+            document.addEventListener("touchend", endDrag);
+            document.addEventListener("touchmove", dragBall); // نقل السحب إلى مستوى المستند
         }
 
         function endGame() {
@@ -137,21 +142,28 @@
             obstacles = [];
             gameOverMessage.style.display = "block";
             startButton.style.display = "block";
+            ball.removeEventListener("touchstart", startDrag);
+            document.removeEventListener("touchend", endDrag);
+            document.removeEventListener("touchmove", dragBall);
         }
 
         function createObstacle() {
             const obstacle = document.createElement("div");
             obstacle.classList.add("obstacle");
-            obstacle.style.left = Math.random() * (gameContainer.clientWidth - 80) + "px"; // ضبط مكان المعثرة بدقة
+            obstacle.style.left = Math.random() * (gameContainer.clientWidth - 100) + "px"; // ضبط مكان المعثرة بدقة
+            obstacle.style.backgroundColor = getRandomColor(); // لون عشوائي للمعثرة
             gameContainer.appendChild(obstacle);
             obstacles.push(obstacle);
+
+            // زيادة السرعة كلما تقدمت في اللعبة
+            speed += 0.2;
         }
 
         function moveObstacles() {
             if (!isGameRunning) return;
 
             obstacles.forEach(obstacle => {
-                const obstacleTop = parseFloat(obstacle.style.top || "-40px") + speed;
+                const obstacleTop = parseFloat(obstacle.style.top || "-50px") + speed;
                 obstacle.style.top = obstacleTop + "px";
 
                 if (obstacleTop > gameContainer.clientHeight) {
@@ -171,16 +183,9 @@
                     endGame();
                 }
             });
-
-            // زيادة السرعة تدريجياً
-            speed += 0.005; // زيادة السرعة بشكل تدريجي
         }
 
         // التحكم بالكرة عن طريق السحب
-        ball.addEventListener("touchstart", startDrag);
-        document.addEventListener("touchend", endDrag);
-        document.addEventListener("touchmove", dragBall);
-
         let isDragging = false;
 
         function startDrag(event) {
@@ -206,6 +211,16 @@
 
         function endDrag() {
             isDragging = false;
+        }
+
+        // وظيفة للحصول على لون عشوائي
+        function getRandomColor() {
+            const letters = "0123456789ABCDEF";
+            let color = "#";
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
         }
     </script>
 </body>
