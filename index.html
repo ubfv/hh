@@ -61,8 +61,8 @@
             position: absolute;
             bottom: 50px;
             left: 50%;
-            width: 45px;
-            height: 45px;
+            width: 40px;
+            height: 40px;
             background-color: #ff4081;
             border-radius: 50%;
             transform: translateX(-50%);
@@ -202,48 +202,46 @@
             return color;
         }
 
-        function moveObstacles() {
-            if (!isGameRunning) return;
+function moveObstacles() {
+    if (!isGameRunning) return;
 
-            obstacles.forEach(obstacle => {
-                const obstacleTop = parseFloat(obstacle.style.top || "-60px") + speed;
-                obstacle.style.top = obstacleTop + "px";
+    obstacles.forEach(obstacle => {
+        const obstacleTop = parseFloat(obstacle.style.top || "-60px") + speed;
+        obstacle.style.top = obstacleTop + "px";
 
-                if (obstacleTop > gameContainer.clientHeight) {
-                    obstacle.remove();
-                    obstacles = obstacles.filter(o => o !== obstacle);
-                    score += 10; // زيادة النقاط عند تجنب العقبات
-                    scoreDisplay.textContent = `النقاط: ${score}`;
-                    
-                    // زيادة السرعة مع زيادة النقاط
-                    if (score % 50 === 0) { // زيادة السرعة كل 50 نقطة
-                        speed += 1; // زيادة السرعة بمقدار 1
-                    }
-                    
-                    // تغيير لون خلفية اللعبة بشكل عشوائي عند الوصول إلى 100 نقطة
-                    if (score >= 100) {
-                        gameContainer.style.backgroundColor = getRandomColor();
-                        // تكرار استخدام اللون الأحمر بشكل أكبر
-                        if (Math.random() < 0.5) {
-                            gameContainer.style.backgroundColor = "#f44336"; // اللون الأحمر
-                        }
-                    }
+        if (obstacleTop > gameContainer.clientHeight) {
+            obstacle.remove();
+            obstacles = obstacles.filter(o => o !== obstacle);
+            score += 10; // زيادة النقاط عند تجنب العقبات
+            scoreDisplay.textContent = `النقاط: ${score}`;
+
+            // زيادة السرعة مع زيادة النقاط
+            if (score % 50 === 0) { // زيادة السرعة كل 50 نقطة
+                speed += 1; // زيادة السرعة بمقدار 1
+            }
+
+            // تغيير لون خلفية اللعبة بشكل عشوائي عند الوصول إلى 100 نقطة
+            if (score >= 100) {
+                gameContainer.style.backgroundColor = getRandomColor();
+                // تكرار استخدام اللون الأحمر بشكل أكبر
+                if (Math.random() < 0.5) {
+                    gameContainer.style.backgroundColor = "#f44336"; // اللون الأحمر
                 }
-
-             // إصلاح منطق الاصطدام
-                const ballRect = ball.getBoundingClientRect();
-                const obstacleRect = obstacle.getBoundingClientRect();
-                if (
-                    ballRect.left < obstacleRect.right &&
-                    ballRect.right > obstacleRect.left &&
-                    ballRect.bottom > obstacleRect.top &&
-                    ballRect.top < obstacleRect.bottom
-                ) {
-                    endGame();
-                }
-            });
+            }
         }
 
+        // منطق الاصطدام الجديد
+        const ballRect = ball.getBoundingClientRect();
+        const obstacleRect = obstacle.getBoundingClientRect();
+
+        const overlapX = ballRect.right > obstacleRect.left && ballRect.left < obstacleRect.right;
+        const overlapY = ballRect.bottom > obstacleRect.top && ballRect.top < obstacleRect.bottom;
+
+        if (overlapX && overlapY) {
+            endGame();
+        }
+    });
+}
         // دعم اللمس لتحريك الكرة
         ball.addEventListener("touchstart", (event) => {
             isDragging = true;
@@ -297,4 +295,3 @@
     </script>
 </body>
 </html>
-
