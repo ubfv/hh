@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لعبة تجاوز المعثرات</title>
     <style>
-        /* تصميم الصفحة بألوان جذابة */
         body {
             display: flex;
             justify-content: center;
@@ -17,7 +16,6 @@
             overflow: hidden;
         }
 
-        /* زر البدء */
         #startButton {
             padding: 15px 30px;
             font-size: 20px;
@@ -28,38 +26,34 @@
             cursor: pointer;
             transition: background-color 0.3s;
         }
-        
+
         #startButton:hover {
             background-color: #e64a19;
         }
 
-        /* حاوية اللعبة */
         #gameContainer {
             display: none;
             position: relative;
-            width: 50vw; /* تصغير العرض إلى 50% من عرض الشاشة */
-            height: 40vh; /* تصغير الارتفاع إلى 40% من ارتفاع الشاشة */
+            width: 80vw;
+            height: 60vh;
             background-color: #64b5f6;
             overflow: hidden;
             border-radius: 20px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
         }
 
-        /* الكرة */
         #ball {
             position: absolute;
             bottom: 50px;
             left: 50%;
-            width: 50px; /* تصغير حجم الكرة */
-            height: 50px; /* تصغير حجم الكرة */
+            width: 50px;
+            height: 50px;
             background-color: #ff4081;
             border-radius: 50%;
             transform: translateX(-50%);
-            cursor: pointer;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
 
-        /* المعثرات */
         .obstacle {
             position: absolute;
             width: 100px;
@@ -70,7 +64,6 @@
             transition: background-color 0.3s;
         }
 
-        /* رسالة الخسارة */
         #gameOverMessage {
             display: none;
             position: absolute;
@@ -88,10 +81,7 @@
     </style>
 </head>
 <body>
-    <!-- زر البدء -->
     <button id="startButton">ابدأ</button>
-
-    <!-- حاوية اللعبة -->
     <div id="gameContainer">
         <div id="ball"></div>
         <div id="gameOverMessage">لقد خسرت! اضغط ابدأ لتجرب مرة أخرى.</div>
@@ -102,7 +92,7 @@
         const gameContainer = document.getElementById("gameContainer");
         const ball = document.getElementById("ball");
         const gameOverMessage = document.getElementById("gameOverMessage");
-        
+
         let isGameRunning = false;
         let ballPositionX = gameContainer.clientWidth / 2;
         let ballPositionY = gameContainer.clientHeight - 100;
@@ -110,9 +100,7 @@
         let obstacleInterval;
         let moveInterval;
         let speed = 10;
-        let ballSpeed = 5;
 
-        // بدء اللعبة
         startButton.addEventListener("click", () => {
             startButton.style.display = "none";
             gameContainer.style.display = "block";
@@ -125,7 +113,7 @@
             ballPositionX = gameContainer.clientWidth / 2;
             ballPositionY = gameContainer.clientHeight - 100;
             ball.style.left = ballPositionX + "px";
-            ball.style.bottom = 50 + "px";
+            ball.style.top = ballPositionY + "px";
 
             obstacles = [];
             obstacleInterval = setInterval(createObstacle, 1000);
@@ -162,7 +150,6 @@
                     obstacles = obstacles.filter(o => o !== obstacle);
                 }
 
-                // التحقق من الاصطدام
                 const ballRect = ball.getBoundingClientRect();
                 const obstacleRect = obstacle.getBoundingClientRect();
                 if (
@@ -176,22 +163,22 @@
             });
         }
 
-        // التحكم بالكرة عن طريق لوحة المفاتيح
         document.addEventListener("keydown", (event) => {
             if (!isGameRunning) return;
 
-            switch(event.key) {
+            const containerRect = gameContainer.getBoundingClientRect();
+            switch (event.key) {
                 case "ArrowUp":
-                    if (ballPositionY > 0) ballPositionY -= ballSpeed;
+                    if (ballPositionY > 0) ballPositionY -= 10;
                     break;
                 case "ArrowDown":
-                    if (ballPositionY < gameContainer.clientHeight - ball.clientHeight) ballPositionY += ballSpeed;
+                    if (ballPositionY < gameContainer.clientHeight - ball.clientHeight) ballPositionY += 10;
                     break;
                 case "ArrowLeft":
-                    if (ballPositionX > 0) ballPositionX -= ballSpeed;
+                    if (ballPositionX > 0) ballPositionX -= 10;
                     break;
                 case "ArrowRight":
-                    if (ballPositionX < gameContainer.clientWidth - ball.clientWidth) ballPositionX += ballSpeed;
+                    if (ballPositionX < gameContainer.clientWidth - ball.clientWidth) ballPositionX += 10;
                     break;
             }
 
@@ -200,4 +187,4 @@
         });
     </script>
 </body>
-        </html>
+    </html>
