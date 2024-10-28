@@ -51,7 +51,7 @@
             position: relative;
             width: 80vw;
             height: 80vh;
-            background-color: #64b5f6;
+            background-color: #64b5f6; /* لون خلفية اللعبة */
             overflow: hidden;
             border-radius: 20px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
@@ -61,8 +61,8 @@
             position: absolute;
             bottom: 50px;
             left: 50%;
-            width: 45px;
-            height: 45px;
+            width: 40px;
+            height: 40px;
             background-color: #ff4081;
             border-radius: 50%;
             transform: translateX(-50%);
@@ -103,7 +103,7 @@
 </head>
 <body>
     <div id="welcomeMessage">
-        مرحبًا هل انت مستعد؟<br> اضغط على أبدا والعب الآن!
+        مرحباً بك في لعبة تجاوز المعثرات!<br> حاول تجنب العقبات وحقق أعلى نتيجة ممكنة!
         <div id="startButton">ابدأ اللعب</div>
     </div>
 
@@ -129,16 +129,16 @@
         let obstacles = [];
         let obstacleInterval;
         let moveInterval;
-        let speed = 5; // سرعة العقبات الابتدائية (متوسطة)
+        let speed = 10; // سرعة العقبات
         let score = 0;
         let isDragging = false;
 
         const obstacleShapes = [
-            {width: 60, height: 40, color: "#f44336"},
-            {width: 40, height: 60, color: "#4caf50"},
-            {width: 70, height: 70, color: "#2196f3"},
-            {width: 80, height: 20, color: "#ffeb3b"},
-            {width: 30, height: 30, color: "#9c27b0"},
+            {width: 60, height: 40, color: "#f44336"}, // مستطيل أحمر
+            {width: 40, height: 60, color: "#4caf50"}, // مستطيل أخضر
+            {width: 70, height: 70, color: "#2196f3"}, // مربع أزرق
+            {width: 80, height: 20, color: "#ffeb3b"}, // مستطيل أصفر
+            {width: 30, height: 30, color: "#9c27b0"}, // مربع بنفسجي
         ];
 
         startButton.addEventListener("click", () => {
@@ -146,7 +146,6 @@
             gameContainer.style.display = "block";
             gameOverMessage.style.display = "none";
             score = 0; // إعادة تعيين النقاط عند بدء اللعبة
-            speed = 5; // إعادة تعيين السرعة عند بدء اللعبة
             scoreDisplay.textContent = `النقاط: ${score}`;
             startGame();
         });
@@ -154,7 +153,6 @@
         restartButton.addEventListener("click", () => {
             gameOverMessage.style.display = "none";
             score = 0; // إعادة تعيين النقاط عند إعادة اللعب
-            speed = 5; // إعادة تعيين السرعة عند إعادة اللعب
             scoreDisplay.textContent = `النقاط: ${score}`;
             startGame();
         });
@@ -162,7 +160,7 @@
         function startGame() {
             isGameRunning = true;
             obstacles = [];
-            obstacleInterval = setInterval(createObstacle, 300); // تقليل الوقت إلى 300 مللي ثانية لزيادة عدد العقبات
+            obstacleInterval = setInterval(createObstacle, 400); // زيادة عدد العقبات من خلال تقليل الوقت إلى 400 مللي ثانية
             moveInterval = setInterval(moveObstacles, 20);
         }
 
@@ -203,47 +201,41 @@
         }
 
         function moveObstacles() {
-            if (!isGameRunning) return;
+    if (!isGameRunning) return;
 
-            obstacles.forEach(obstacle => {
-                const obstacleTop = parseFloat(obstacle.style.top || "-60px") + speed;
-                obstacle.style.top = obstacleTop + "px";
+    obstacles.forEach(obstacle => {
+        const obstacleTop = parseFloat(obstacle.style.top || "-60px") + speed;
+        obstacle.style.top = obstacleTop + "px";
 
-                if (obstacleTop > gameContainer.clientHeight) {
-                    obstacle.remove();
-                    obstacles = obstacles.filter(o => o !== obstacle);
-                    score += 10; // زيادة النقاط عند تجنب العقبات
-                    scoreDisplay.textContent = `النقاط: ${score}`;
-                    
-                    // زيادة السرعة مع زيادة النقاط
-                    if (score % 50 === 0) { // زيادة السرعة كل 50 نقطة
-                        speed += 1; // زيادة السرعة بمقدار 1
-                    }
-                    
-                    // تغيير لون خلفية اللعبة بشكل عشوائي عند الوصول إلى 100 نقطة
-                    if (score >= 100) {
-                        gameContainer.style.backgroundColor = getRandomColor();
-                        // تكرار استخدام اللون الأحمر بشكل أكبر
-                        if (Math.random() < 0.5) {
-                            gameContainer.style.backgroundColor = "#f44336"; // اللون الأحمر
-                        }
-                    }
-                }
-
-             // إصلاح منطق الاصطدام
-                const ballRect = ball.getBoundingClientRect();
-                const obstacleRect = obstacle.getBoundingClientRect();
-                if (
-                    ballRect.left < obstacleRect.right &&
-                    ballRect.right > obstacleRect.left &&
-                    ballRect.bottom > obstacleRect.top &&
-                    ballRect.top < obstacleRect.bottom
-                ) {
-                    endGame();
-                }
-            });
+        if (obstacleTop > gameContainer.clientHeight) {
+            obstacle.remove();
+            obstacles = obstacles.filter(o => o !== obstacle);
+            score += 10; // زيادة النقاط عند تجنب العقبات
+            scoreDisplay.textContent = `النقاط: ${score}`;
         }
 
+        // إصلاح منطق الاصطدام
+        const ballRect = ball.getBoundingClientRect();
+        const obstacleRect = obstacle.getBoundingClientRect();
+        if (
+            ballRect.left < obstacleRect.right &&
+            ballRect.right > obstacleRect.left &&
+            ballRect.bottom > obstacleRect.top &&
+            ballRect.top < obstacleRect.bottom
+        ) {
+            // تحديد المسافات الصغيرة
+            const collisionBuffer = 5; // الحد الأدنى للمسافة لتجنب الاصطدام
+            if (
+                Math.abs(ballRect.right - obstacleRect.left) < collisionBuffer ||
+                Math.abs(ballRect.left - obstacleRect.right) < collisionBuffer ||
+                Math.abs(ballRect.bottom - obstacleRect.top) < collisionBuffer ||
+                Math.abs(ballRect.top - obstacleRect.bottom) < collisionBuffer
+            ) {
+                endGame();
+            }
+        }
+    });
+}
         // دعم اللمس لتحريك الكرة
         ball.addEventListener("touchstart", (event) => {
             isDragging = true;
