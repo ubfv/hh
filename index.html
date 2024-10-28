@@ -25,8 +25,8 @@
             border-radius: 10px;
             cursor: pointer;
             transition: background-color 0.3s;
-            position: absolute; /* اجعل الزر في مكان محدد */
-            top: 20px; /* حرك الزر للأعلى */
+            position: absolute;
+            top: 20px;
             left: 50%;
             transform: translateX(-50%);
         }
@@ -63,30 +63,9 @@
             position: absolute;
             width: 60px; /* جعل عرض العقبات أصغر */
             height: 40px; /* ارتفاع ثابت للعقبات */
-            background-color: #f44336;
+            background-color: #f44336; /* لون العقبة الأحمر */
             border-radius: 5px;
-            top: -60px;
             transition: background-color 0.3s;
-        }
-
-        .fixedObstacle {
-            position: absolute;
-            width: 60px; /* جعل عرض العقبات أصغر */
-            height: 40px; /* ارتفاع ثابت للعقبات */
-            background-color: #f44336;
-            transition: background-color 0.3s;
-        }
-
-        #leftObstacle {
-            left: 30%; /* افصلها أكثر */
-            top: 50%; /* ضعها في المنتصف */
-            transform: translateY(-50%);
-        }
-
-        #rightObstacle {
-            right: 30%; /* افصلها أكثر */
-            top: 50%; /* ضعها في المنتصف */
-            transform: translateY(-50%);
         }
 
         #gameOverMessage {
@@ -118,8 +97,6 @@
     <button id="startButton">ابدأ</button>
     <div id="gameContainer">
         <div id="ball"></div>
-        <div id="leftObstacle" class="fixedObstacle"></div>
-        <div id="rightObstacle" class="fixedObstacle"></div>
         <div id="scoreDisplay">النقاط: 0</div>
         <div id="gameOverMessage">لقد خسرت! اضغط ابدأ لتجرب مرة أخرى.</div>
     </div>
@@ -151,7 +128,7 @@
         function startGame() {
             isGameRunning = true;
             obstacles = [];
-            obstacleInterval = setInterval(createObstacle, 1000);
+            obstacleInterval = setInterval(createObstacle, 500); // تقليل الوقت إلى 500 مللي ثانية لزيادة سرعة ظهور العقبات
             moveInterval = setInterval(moveObstacles, 20);
         }
 
@@ -168,7 +145,9 @@
         function createObstacle() {
             const obstacle = document.createElement("div");
             obstacle.classList.add("obstacle");
-            obstacle.style.left = Math.random() * (gameContainer.clientWidth - 100) + "px";
+            obstacle.style.left = "50%"; // جعل العقبة في المنتصف
+            obstacle.style.transform = "translateX(-50%)"; // لتكون في منتصف الشاشة
+            obstacle.style.top = "-40px"; // تظهر من أعلى الشاشة
             gameContainer.appendChild(obstacle);
             obstacles.push(obstacle);
         }
@@ -198,6 +177,10 @@
                     // تغيير لون خلفية اللعبة بشكل عشوائي عند الوصول إلى 100 نقطة
                     if (score >= 100) {
                         gameContainer.style.backgroundColor = getRandomColor(); // تغيير لون الخلفية الداخلية
+                        // تكرار استخدام اللون الأحمر بشكل أكبر
+                        if (Math.random() < 0.5) {
+                            gameContainer.style.backgroundColor = "#f44336"; // اللون الأحمر
+                        }
                     }
                 }
 
