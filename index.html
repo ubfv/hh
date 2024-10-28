@@ -2,7 +2,7 @@
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, content-scale=1.0">
     <title>لعبة تجاوز المعثرات</title>
     <style>
         body {
@@ -61,7 +61,7 @@
 
         .obstacle {
             position: absolute;
-            width: 60px; /* جعل عرض العقبات أصغر */
+            width: 60px; /* عرض العقبات */
             height: 40px; /* ارتفاع ثابت للعقبات */
             background-color: #f44336; /* لون العقبة الأحمر */
             border-radius: 5px;
@@ -112,7 +112,7 @@
         let obstacles = [];
         let obstacleInterval;
         let moveInterval;
-        let speed = 10;
+        let speed = 15; // زيادة سرعة العقبات
         let score = 0;
         let isDragging = false;
 
@@ -128,7 +128,7 @@
         function startGame() {
             isGameRunning = true;
             obstacles = [];
-            obstacleInterval = setInterval(createObstacle, 500); // تقليل الوقت إلى 500 مللي ثانية لزيادة سرعة ظهور العقبات
+            obstacleInterval = setInterval(createObstacle, 400); // زيادة عدد العقبات من خلال تقليل الوقت إلى 400 مللي ثانية
             moveInterval = setInterval(moveObstacles, 20);
         }
 
@@ -145,8 +145,13 @@
         function createObstacle() {
             const obstacle = document.createElement("div");
             obstacle.classList.add("obstacle");
+
+            // تحديد مكان العقبة بناءً على موقع الكرة
+            const ballRect = ball.getBoundingClientRect();
             const randomX = Math.random() * (gameContainer.clientWidth - 60); // مكان عشوائي في العرض
-            obstacle.style.left = randomX + "px"; // وضع العقبة في موقع عشوائي
+            const obstacleX = Math.abs(randomX - ballRect.left) < 100 ? randomX + 100 : randomX; // تجنب المكان القريب من الكرة
+
+            obstacle.style.left = obstacleX + "px"; // وضع العقبة في موقع عشوائي
             obstacle.style.top = "-40px"; // تظهر من أعلى الشاشة
             gameContainer.appendChild(obstacle);
             obstacles.push(obstacle);
