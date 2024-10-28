@@ -40,7 +40,7 @@
             position: relative;
             width: 80vw;
             height: 80vh;
-            background-color: #64b5f6;
+            background-color: #64b5f6; /* لون خلفية اللعبة */
             overflow: hidden;
             border-radius: 20px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
@@ -61,8 +61,8 @@
 
         .obstacle {
             position: absolute;
-            width: 80px;
-            height: 40px;
+            width: 60px; /* جعل عرض العقبات أصغر */
+            height: 40px; /* ارتفاع ثابت للعقبات */
             background-color: #f44336;
             border-radius: 5px;
             top: -60px;
@@ -71,20 +71,20 @@
 
         .fixedObstacle {
             position: absolute;
-            width: 200px; /* جعل العرض أكبر */
-            height: 80px; /* ارتفاع ثابت للأجسام */
+            width: 60px; /* جعل عرض العقبات أصغر */
+            height: 40px; /* ارتفاع ثابت للعقبات */
             background-color: #f44336;
             transition: background-color 0.3s;
         }
 
         #leftObstacle {
-            left: 0;
+            left: 30%; /* افصلها أكثر */
             top: 50%; /* ضعها في المنتصف */
             transform: translateY(-50%);
         }
 
         #rightObstacle {
-            right: 0;
+            right: 30%; /* افصلها أكثر */
             top: 50%; /* ضعها في المنتصف */
             transform: translateY(-50%);
         }
@@ -195,9 +195,9 @@
                     score += 10; // زيادة النقاط عند تجنب العقبات
                     scoreDisplay.textContent = `النقاط: ${score}`;
                     
-                    // تغيير لون الخلفية بشكل عشوائي عند الوصول إلى 100 نقطة
+                    // تغيير لون خلفية اللعبة بشكل عشوائي عند الوصول إلى 100 نقطة
                     if (score >= 100) {
-                        document.body.style.backgroundColor = getRandomColor(); // تغيير اللون إلى لون عشوائي
+                        gameContainer.style.backgroundColor = getRandomColor(); // تغيير لون الخلفية الداخلية
                     }
                 }
 
