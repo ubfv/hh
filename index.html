@@ -5,7 +5,100 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لعبة تجاوز المعثرات</title>
     <style>
-        /* أنماط CSS كما هي */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            overflow: hidden;
+        }
+
+        #welcomeMessage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            color: #fff;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        #startButton, #restartButton {
+            padding: 15px 30px;
+            font-size: 20px;
+            color: #fff;
+            background-color: #ff5722;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+        }
+
+        #startButton:hover, #restartButton:hover {
+            background-color: #e64a19;
+        }
+
+        #gameContainer {
+            display: none;
+            position: relative;
+            width: 80vw;
+            height: 80vh;
+            background-color: #64b5f6;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        #ball {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            width: 45px;
+            height: 45px;
+            background-color: #ff4081;
+            border-radius: 50%;
+            transform: translateX(-50%);
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .obstacle {
+            position: absolute;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        #gameOverMessage {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            color: #fff;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        #scoreDisplay {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -36,16 +129,16 @@
         let obstacles = [];
         let obstacleInterval;
         let moveInterval;
-        let speed = 5; // بداية السرعة متوسطة
+        let speed = 5; // سرعة العقبات الابتدائية (متوسطة)
         let score = 0;
         let isDragging = false;
 
         const obstacleShapes = [
-            {width: 60, height: 40, color: "#f44336"}, // مستطيل أحمر
-            {width: 40, height: 60, color: "#4caf50"}, // مستطيل أخضر
-            {width: 70, height: 70, color: "#2196f3"}, // مربع أزرق
-            {width: 80, height: 20, color: "#ffeb3b"}, // مستطيل أصفر
-            {width: 30, height: 30, color: "#9c27b0"}, // مربع بنفسجي
+            {width: 60, height: 40, color: "#f44336"},
+            {width: 40, height: 60, color: "#4caf50"},
+            {width: 70, height: 70, color: "#2196f3"},
+            {width: 80, height: 20, color: "#ffeb3b"},
+            {width: 30, height: 30, color: "#9c27b0"},
         ];
 
         startButton.addEventListener("click", () => {
@@ -53,6 +146,7 @@
             gameContainer.style.display = "block";
             gameOverMessage.style.display = "none";
             score = 0; // إعادة تعيين النقاط عند بدء اللعبة
+            speed = 5; // إعادة تعيين السرعة عند بدء اللعبة
             scoreDisplay.textContent = `النقاط: ${score}`;
             startGame();
         });
@@ -60,6 +154,7 @@
         restartButton.addEventListener("click", () => {
             gameOverMessage.style.display = "none";
             score = 0; // إعادة تعيين النقاط عند إعادة اللعب
+            speed = 5; // إعادة تعيين السرعة عند إعادة اللعب
             scoreDisplay.textContent = `النقاط: ${score}`;
             startGame();
         });
@@ -67,7 +162,7 @@
         function startGame() {
             isGameRunning = true;
             obstacles = [];
-            obstacleInterval = setInterval(createObstacle, 400); // زيادة عدد العقبات
+            obstacleInterval = setInterval(createObstacle, 300); // تقليل الوقت إلى 300 مللي ثانية لزيادة عدد العقبات
             moveInterval = setInterval(moveObstacles, 20);
         }
 
@@ -90,8 +185,7 @@
             obstacle.style.height = shape.height + "px";
             obstacle.style.backgroundColor = shape.color;
 
-            // وضع العقبة بشكل عشوائي حسب مكان الكرة
-            const ballRect = ball.getBoundingClientRect();
+            // وضع العقبة بشكل عشوائي
             const randomX = Math.random() * (gameContainer.clientWidth - shape.width);
             obstacle.style.left = randomX + "px"; 
             obstacle.style.top = "-40px"; // تظهر من أعلى الشاشة
@@ -120,20 +214,23 @@
                     obstacles = obstacles.filter(o => o !== obstacle);
                     score += 10; // زيادة النقاط عند تجنب العقبات
                     scoreDisplay.textContent = `النقاط: ${score}`;
-
+                    
                     // زيادة السرعة مع زيادة النقاط
-                    speed = 5 + Math.floor(score / 50); // كل 50 نقطة تزيد السرعة بمقدار 1
-
+                    if (score % 50 === 0) { // زيادة السرعة كل 50 نقطة
+                        speed += 1; // زيادة السرعة بمقدار 1
+                    }
+                    
                     // تغيير لون خلفية اللعبة بشكل عشوائي عند الوصول إلى 100 نقطة
                     if (score >= 100) {
                         gameContainer.style.backgroundColor = getRandomColor();
+                        // تكرار استخدام اللون الأحمر بشكل أكبر
                         if (Math.random() < 0.5) {
                             gameContainer.style.backgroundColor = "#f44336"; // اللون الأحمر
                         }
                     }
                 }
 
-                // إصلاح منطق الاصطدام
+             // إصلاح منطق الاصطدام
                 const ballRect = ball.getBoundingClientRect();
                 const obstacleRect = obstacle.getBoundingClientRect();
                 if (
