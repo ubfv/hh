@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لعبة تجاوز المعثرات</title>
     <style>
-        /* تصميم الصفحة بألوان جذابة */
         body {
             display: flex;
             justify-content: center;
@@ -37,8 +36,8 @@
         #gameContainer {
             display: none;
             position: relative;
-            width: 90vw;
-            height: 70vh;
+            width: 400px; /* تعديل العرض */
+            height: 300px; /* تعديل الارتفاع */
             background-color: #64b5f6;
             overflow: hidden;
             border-radius: 20px;
@@ -50,8 +49,8 @@
             position: absolute;
             bottom: 50px;
             left: 50%;
-            width: 80px;
-            height: 80px;
+            width: 40px; /* تقليل حجم الكرة */
+            height: 40px; /* تقليل حجم الكرة */
             background-color: #ff4081;
             border-radius: 50%;
             transform: translateX(-50%);
@@ -62,11 +61,11 @@
         /* المعثرات */
         .obstacle {
             position: absolute;
-            width: 100px;
-            height: 50px;
+            width: 50px; /* تقليل حجم المعثرات */
+            height: 25px; /* تقليل حجم المعثرات */
             background-color: #f44336;
             border-radius: 5px;
-            top: -60px;
+            top: -30px;
             transition: background-color 0.3s;
         }
 
@@ -77,21 +76,19 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 24px;
+            font-size: 18px;
             color: #fff;
             text-align: center;
             background-color: rgba(0, 0, 0, 0.7);
-            padding: 20px;
+            padding: 10px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
     </style>
 </head>
 <body>
-    <!-- زر البدء -->
     <button id="startButton">ابدأ</button>
 
-    <!-- حاوية اللعبة -->
     <div id="gameContainer">
         <div id="ball"></div>
         <div id="gameOverMessage">لقد خسرت! اضغط ابدأ لتجرب مرة أخرى.</div>
@@ -105,11 +102,11 @@
         
         let isGameRunning = false;
         let ballPositionX = gameContainer.clientWidth / 2;
-        let ballPositionY = gameContainer.clientHeight - 100;
+        let ballPositionY = 50;
         let obstacles = [];
         let obstacleInterval;
         let moveInterval;
-        let speed = 10;
+        let speed = 2; // تقليل سرعة الحركة
 
         // بدء اللعبة
         startButton.addEventListener("click", () => {
@@ -122,9 +119,9 @@
         function startGame() {
             isGameRunning = true;
             ballPositionX = gameContainer.clientWidth / 2;
-            ballPositionY = gameContainer.clientHeight - 100;
+            ballPositionY = 50;
             ball.style.left = ballPositionX + "px";
-            ball.style.bottom = 50 + "px";
+            ball.style.bottom = ballPositionY + "px";
 
             obstacles = [];
             obstacleInterval = setInterval(createObstacle, 1000);
@@ -144,7 +141,7 @@
         function createObstacle() {
             const obstacle = document.createElement("div");
             obstacle.classList.add("obstacle");
-            obstacle.style.left = Math.random() * (gameContainer.clientWidth - 100) + "px";
+            obstacle.style.left = Math.random() * (gameContainer.clientWidth - 50) + "px";
             gameContainer.appendChild(obstacle);
             obstacles.push(obstacle);
         }
@@ -153,7 +150,7 @@
             if (!isGameRunning) return;
 
             obstacles.forEach(obstacle => {
-                const obstacleTop = parseFloat(obstacle.style.top || "-60px") + speed;
+                const obstacleTop = parseFloat(obstacle.style.top || "-30px") + speed;
                 obstacle.style.top = obstacleTop + "px";
 
                 if (obstacleTop > gameContainer.clientHeight) {
@@ -161,7 +158,6 @@
                     obstacles = obstacles.filter(o => o !== obstacle);
                 }
 
-                // التحقق من الاصطدام
                 const ballRect = ball.getBoundingClientRect();
                 const obstacleRect = obstacle.getBoundingClientRect();
                 if (
@@ -175,37 +171,26 @@
             });
         }
 
-        // التحكم بالكرة عن طريق السحب
-        ball.addEventListener("touchstart", startDrag);
-        document.addEventListener("touchend", endDrag);
-        document.addEventListener("touchmove", dragBall);
+        // التحكم بالكرة باستخدام الأسهم
+        document.addEventListener("keydown", (event) => {
+            if (!isGameRunning) return;
 
-        let isDragging = false;
+            const containerRect = gameContainer.getBoundingClientRect();
+            const step = 10; // مقدار الحركة لكل ضغطة
 
-        function startDrag(event) {
-            isDragging = true;
-            event.preventDefault();
-        }
-
-        function dragBall(event) {
-            if (isDragging && isGameRunning) {
-                const containerRect = gameContainer.getBoundingClientRect();
-                let newPositionX = event.touches[0].clientX - containerRect.left - ball.clientWidth / 2;
-
-                // تأكيد أن الكرة لا تخرج عن حدود الحاوية
-                if (newPositionX < 0) newPositionX = 0;
-                if (newPositionX > gameContainer.clientWidth - ball.clientWidth) {
-                    newPositionX = gameContainer.clientWidth - ball.clientWidth;
-                }
-
-                ballPositionX = newPositionX;
-                ball.style.left = ballPositionX + "px";
+            if (event.key === "ArrowRight" && ballPositionX + step < containerRect.width - ball.clientWidth) {
+                ballPositionX += step;
+            } else if (event.key === "ArrowLeft" && ballPositionX - step > 0) {
+                ballPositionX -= step;
+            } else if (event.key === "ArrowUp" && ballPositionY + step < containerRect.height - ball.clientHeight) {
+                ballPositionY += step;
+            } else if (event.key === "ArrowDown" && ballPositionY - step > 0) {
+                ballPositionY -= step;
             }
-        }
 
-        function endDrag() {
-            isDragging = false;
-        }
+            ball.style.left = ballPositionX + "px";
+            ball.style.bottom = ballPositionY + "px";
+        });
     </script>
 </body>
 </html>
