@@ -122,9 +122,10 @@
             obstacleInterval = setInterval(createObstacle, 2000);
             moveInterval = setInterval(moveObstacles, 20);
 
-            ball.addEventListener("mousedown", startDrag);
-            document.addEventListener("mouseup", endDrag);
-            document.addEventListener("mousemove", dragBall); // نقل السحب إلى مستوى المستند
+            // إضافة أحداث اللمس
+            ball.addEventListener("touchstart", startDrag);
+            document.addEventListener("touchend", endDrag);
+            document.addEventListener("touchmove", dragBall); // نقل السحب إلى مستوى المستند
         }
 
         function endGame() {
@@ -135,9 +136,9 @@
             obstacles = [];
             gameOverMessage.style.display = "block";
             startButton.style.display = "block";
-            ball.removeEventListener("mousedown", startDrag);
-            document.removeEventListener("mouseup", endDrag);
-            document.removeEventListener("mousemove", dragBall);
+            ball.removeEventListener("touchstart", startDrag);
+            document.removeEventListener("touchend", endDrag);
+            document.removeEventListener("touchmove", dragBall);
         }
 
         function createObstacle() {
@@ -189,7 +190,7 @@
         function dragBall(event) {
             if (isDragging && isGameRunning) {
                 const containerRect = gameContainer.getBoundingClientRect();
-                let newPositionX = event.clientX - containerRect.left - ball.clientWidth / 2;
+                let newPositionX = event.touches[0].clientX - containerRect.left - ball.clientWidth / 2;
 
                 // تأكيد أن الكرة لا تخرج عن حدود الحاوية
                 if (newPositionX < 0) newPositionX = 0;
