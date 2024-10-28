@@ -22,7 +22,7 @@
             padding: 15px 30px;
             font-size: 20px;
             color: #fff;
-            background-color: #ff5722; /* لون زري فاتح */
+            background-color: #ff5722; /* لون زر فاتح */
             border: none;
             border-radius: 10px;
             cursor: pointer;
@@ -37,9 +37,9 @@
         #gameContainer {
             display: none;
             position: relative;
-            width: 80vw;
-            height: 70vh;
-            background-color: #4caf50; /* لون مميز للخلفية الداخلية */
+            width: 80vw; /* عرض الحاوية */
+            height: 50px; /* تعديل ارتفاع الحاوية */
+            background-color: #4caf50; /* تغيير لون الخلفية الداخلية */
             overflow: hidden;
             border-radius: 20px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
@@ -48,11 +48,11 @@
         /* الكرة */
         #ball {
             position: absolute;
-            bottom: 50px;
+            bottom: 10px; /* موقع الكرة */
             left: 50%;
-            width: 70px; /* تقليل حجم الكرة */
-            height: 70px; /* تقليل حجم الكرة */
-            background-color: #ff4081; /* لون الكرة الوردي الفاتح */
+            width: 30px; /* تقليل حجم الكرة */
+            height: 30px; /* تقليل حجم الكرة */
+            background-color: #ff80ab; /* لون الكرة إلى وردي فاتح */
             border-radius: 50%;
             transform: translateX(-50%);
             cursor: pointer;
@@ -62,8 +62,8 @@
         /* المعثرات */
         .obstacle {
             position: absolute;
-            width: 120px; /* حجم المعثرات */
-            height: 60px; /* حجم المعثرات */
+            width: 120px; /* تكبير المعثرات */
+            height: 60px; /* تكبير المعثرات */
             background-color: #f44336; /* لون المعثرات */
             border-radius: 5px;
             top: -60px;
@@ -104,11 +104,10 @@
         const gameOverMessage = document.getElementById("gameOverMessage");
         
         let isGameRunning = false;
-        let ballPositionX = gameContainer.clientWidth / 2;
         let obstacles = [];
         let obstacleInterval;
         let moveInterval;
-        let speed = 10; // زيادة السرعة الأساسية
+        let speed = 5; // سرعة المعثرات
 
         // بدء اللعبة
         startButton.addEventListener("click", () => {
@@ -120,12 +119,10 @@
 
         function startGame() {
             isGameRunning = true;
-            ballPositionX = gameContainer.clientWidth / 2;
-            ball.style.left = ballPositionX + "px";
-            speed = 10; // إعادة تعيين السرعة
-
+            ball.style.left = "50%";
+            ball.style.bottom = "10px"; // إعادة تعيين موقع الكرة
             obstacles = [];
-            obstacleInterval = setInterval(createObstacle, 1000); // زيادة عدد المعثرات
+            obstacleInterval = setInterval(createObstacle, 2000);
             moveInterval = setInterval(moveObstacles, 20);
         }
 
@@ -189,15 +186,20 @@
             if (isDragging && isGameRunning) {
                 const containerRect = gameContainer.getBoundingClientRect();
                 let newPositionX = event.touches[0].clientX - containerRect.left - ball.clientWidth / 2;
+                let newPositionY = event.touches[0].clientY - containerRect.top - ball.clientHeight / 2;
 
                 // تأكيد أن الكرة لا تخرج عن حدود الحاوية
                 if (newPositionX < 0) newPositionX = 0;
                 if (newPositionX > gameContainer.clientWidth - ball.clientWidth) {
                     newPositionX = gameContainer.clientWidth - ball.clientWidth;
                 }
+                if (newPositionY < 0) newPositionY = 0; // منع الكرة من الخروج للأعلى
+                if (newPositionY > gameContainer.clientHeight - ball.clientHeight) {
+                    newPositionY = gameContainer.clientHeight - ball.clientHeight; // منع الكرة من الخروج للأسفل
+                }
 
-                ballPositionX = newPositionX;
-                ball.style.left = ballPositionX + "px";
+                ball.style.left = newPositionX + "px";
+                ball.style.bottom = newPositionY + "px";
             }
         }
 
